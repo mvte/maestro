@@ -58,13 +58,22 @@ public class PlayerManager {
 	 */
 	public void loadAndPlay(TextChannel channel, String trackURL) {
 		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+		musicManager.scheduler.setChannel(channel);
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
 			//defining an AudioLoadResultHandler
 			@Override
 			public void trackLoaded(AudioTrack track) {
-				musicManager.scheduler.queue(track);
-				channel.sendMessage(":notes: adding to queue :notes:\n`" + 
+				
+				// If there is no song playing, display the "now playing message"
+				if(musicManager.audioPlayer.getPlayingTrack() != null) {
+					channel.sendMessage(":notes: adding to queue :notes:\n`" + 
 						track.getInfo().title + "` by `" + track.getInfo().author + "`").queue();
+				} else {
+					channel.sendMessage(":notes: now playing :notes:\n`" + track.getInfo().title + "` by `" + track.getInfo().author + "`").queue();
+				}
+				
+				musicManager.scheduler.queue(track);
+				
 			}
 
 			@Override
@@ -72,9 +81,7 @@ public class PlayerManager {
 				final List<AudioTrack> tracks = playlist.getTracks();
 				
 				if(playlist.isSearchResult()) {
-					musicManager.scheduler.queue(tracks.get(0));
-					channel.sendMessage(":notes: adding to queue :notes:\n`" + 
-							tracks.get(0).getInfo().title + "` by `" + tracks.get(0).getInfo().author + "`").queue();
+					trackLoaded(tracks.get(0));
 					return;
 				}
 				
@@ -94,7 +101,8 @@ public class PlayerManager {
 
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				// TODO Auto-generated method stub
+				channel.sendMessage("uh oh, something went wrong D:\n" + exception.getMessage().toLowerCase()).queue();
+				exception.printStackTrace();
 				
 			}
 			

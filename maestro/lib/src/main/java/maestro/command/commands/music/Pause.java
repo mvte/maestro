@@ -2,8 +2,6 @@ package maestro.command.commands.music;
 
 import java.util.List;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
@@ -12,7 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Skip implements CommandInterface {
+public class Pause implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
@@ -36,34 +34,27 @@ public class Skip implements CommandInterface {
 		}
 		
 		final GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-		final AudioPlayer player = manager.audioPlayer;
 		
-		if(player.getPlayingTrack() == null) {
-			channel.sendMessage("i'm not playing anything").queue();
-			return;
+		final boolean newPause = !manager.audioPlayer.isPaused();
+		manager.audioPlayer.setPaused(newPause);
+		
+		if(newPause) {
+			channel.sendMessage("paused").queue();
+		} else {
+			channel.sendMessage("resumed").queue();
 		}
-		
-		
-		channel.sendMessage("skipping...").queue();
-		if(manager.scheduler.queue.isEmpty()) {
-			player.stopTrack();
-			return;
-		}
-		
-		manager.scheduler.nextTrack();
 		
 	}
 
 	@Override
 	public String getName() {
-		return "skip";
+		return "pause";
 	}
 
 	@Override
 	public String getHelp() {
-		return "skips to next track in queue";
+		return "pauses the current track, or resumes it if already paused";
 	}
 	
 	
-
 }

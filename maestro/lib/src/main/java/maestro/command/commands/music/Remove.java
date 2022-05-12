@@ -3,6 +3,7 @@ package maestro.command.commands.music;
 import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
@@ -12,7 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Skip implements CommandInterface {
+public class Remove implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
@@ -43,27 +44,54 @@ public class Skip implements CommandInterface {
 			return;
 		}
 		
-		
-		channel.sendMessage("skipping...").queue();
 		if(manager.scheduler.queue.isEmpty()) {
-			player.stopTrack();
+			channel.sendMessage("there is nothing in the queue to remove").queue();
 			return;
 		}
 		
-		manager.scheduler.nextTrack();
+		String nStr = args.get(0);
+		
+		int n;
+		try {
+			n = Integer.parseInt(nStr);
+		} catch (Exception e) {
+			channel.sendMessage("must enter an integer").queue();
+			return;
+		}
+		
+		if(n > manager.scheduler.queue.size()) {
+			channel.sendMessageFormat("cannot remove track %d (there are only %d tracks in the queue)", n, manager.scheduler.queue.size()).queue();
+			return;
+		}
+		
+		if(n < 0) {
+			channel.sendMessage("integer must be positive").queue();
+			return;
+		}
+		
+		int i = 1;
+		for(AudioTrack track : manager.scheduler.queue) {
+			if(i == n) {
+				manager.scheduler.queue.remove(track);
+				channel.sendMessageFormat("removing track\n`%s` by `%s`", track.getInfo().title, track.getInfo().author).queue();
+				return;
+			}
+			i++;
+		}
 		
 	}
 
 	@Override
 	public String getName() {
-		return "skip";
+		return "remove";
 	}
-
+	
+	//If the prefix is used 
+	
+	
 	@Override
 	public String getHelp() {
-		return "skips to next track in queue";
+		return "removes the *nth* track in the queue\n m.remove `[n]`";
 	}
-	
-	
 
 }

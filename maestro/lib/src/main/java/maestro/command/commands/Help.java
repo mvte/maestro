@@ -7,7 +7,6 @@ import maestro.CommandManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Help implements CommandInterface{
@@ -28,7 +27,7 @@ public class Help implements CommandInterface{
 				.setTitle("| maestro help |")
 				.setDescription("use `m.help [command]` for more information about a command")
 				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `snipe`", false)
-				.addField("music commands", "`join`, `leave`, `play`", false)
+				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
 				.addField("blackjack", "21", false)
 				.addField("sniping", "you first", false)
 				.setFooter("by mute | https://github.com/mvte");

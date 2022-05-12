@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Skip implements CommandInterface {
+public class NowPlaying implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
@@ -35,35 +35,30 @@ public class Skip implements CommandInterface {
 			channel.sendMessage("you need to be in the same voice channel as me").queue();
 		}
 		
+		
 		final GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 		final AudioPlayer player = manager.audioPlayer;
 		
-		if(player.getPlayingTrack() == null) {
+		if(player.getPlayingTrack() != null) {
+			channel.sendMessage(":notes: now playing :notes:\n`" + player.getPlayingTrack().getInfo().title + "` by `" + player.getPlayingTrack().getInfo().author + "`").queue();
+			return;
+		} else {
 			channel.sendMessage("i'm not playing anything").queue();
-			return;
 		}
 		
 		
-		channel.sendMessage("skipping...").queue();
-		if(manager.scheduler.queue.isEmpty()) {
-			player.stopTrack();
-			return;
-		}
 		
-		manager.scheduler.nextTrack();
 		
 	}
 
 	@Override
 	public String getName() {
-		return "skip";
+		return "np";
 	}
 
 	@Override
 	public String getHelp() {
-		return "skips to next track in queue";
+		return "displays the song that is currently playing";
 	}
 	
-	
-
 }

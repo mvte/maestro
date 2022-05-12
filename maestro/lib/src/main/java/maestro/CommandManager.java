@@ -33,6 +33,11 @@ public class CommandManager {
 		addCommand(new Play());
 		addCommand(new Stop());
 		addCommand(new Skip());
+		addCommand(new NowPlaying());
+		addCommand(new Queue());
+		addCommand(new Repeat());
+		addCommand(new Remove());
+		addCommand(new Pause());
 	}
 
 	private void addCommand(CommandInterface cmd) {

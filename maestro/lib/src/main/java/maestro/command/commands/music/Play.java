@@ -46,7 +46,6 @@ public class Play implements CommandInterface {
 		// Create PlayerManager and use it to load the song. 
 		PlayerManager.getInstance()
 			.loadAndPlay(channel, link);
-		
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package maestro.command.commands.music;
 import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
@@ -12,7 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Skip implements CommandInterface {
+public class Repeat implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
@@ -43,27 +44,28 @@ public class Skip implements CommandInterface {
 			return;
 		}
 		
+		final boolean newRep = !manager.scheduler.repeating;
+		manager.scheduler.repeating = newRep;
+		AudioTrack track = manager.audioPlayer.getPlayingTrack();
 		
-		channel.sendMessage("skipping...").queue();
-		if(manager.scheduler.queue.isEmpty()) {
-			player.stopTrack();
-			return;
+		if(newRep) {
+			channel.sendMessage(":notes: repeating :notes:\n`" + track.getInfo().title + "` by `" + track.getInfo().author + "`").queue();
+		} else {
+			channel.sendMessage("no longer repeating").queue();
 		}
-		
-		manager.scheduler.nextTrack();
 		
 	}
 
 	@Override
 	public String getName() {
-		return "skip";
+		return "repeat";
 	}
 
 	@Override
 	public String getHelp() {
-		return "skips to next track in queue";
+		// TODO Auto-generated method stub
+		return "repeats the currently playing song. if a song is already repeating, stops repeating";
 	}
-	
-	
 
+	
 }

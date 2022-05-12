@@ -1,0 +1,12 @@
+PlayerManager
+	GuildMusicManager
+		AudioPlayerManager
+		TrackScheduler
+		
+PlayerManager
+	members:
+		hash map of guild music managers
+		audioplayermanager
+
+GuildMusicManager
+	

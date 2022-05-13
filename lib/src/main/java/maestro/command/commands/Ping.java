@@ -22,7 +22,7 @@ public class Ping implements CommandInterface {
 		return "ping";
 	}
 
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "displays \"pong!\" along with the maestro's ping to discord's servers";
 	}
 	

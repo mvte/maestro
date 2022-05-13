@@ -21,7 +21,7 @@ public class Snipe implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "the bot will send you a message when a section for a sniped class has opened\nusage: m.snipe `<index>`";
 	}
 	

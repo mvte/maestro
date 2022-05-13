@@ -62,7 +62,7 @@ public class Repeat implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		// TODO Auto-generated method stub
 		return "repeats the currently playing song. if a song is already repeating, stops repeating";
 	}

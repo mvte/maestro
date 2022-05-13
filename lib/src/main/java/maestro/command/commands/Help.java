@@ -5,6 +5,7 @@ import java.util.List;
 
 import maestro.Bot;
 import maestro.CommandManager;
+import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -21,13 +22,14 @@ public class Help implements CommandInterface{
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		MessageChannel channel = event.getChannel();
 		EmbedBuilder embed = new EmbedBuilder().setColor(new Color(0x000000));
+		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		// Help command was invoked without any arguments, will display the default message
 		if(args.isEmpty()) {
 			embed
 				.setTitle("| maestro help |")
-				.setDescription("use `" + Bot.prefix + "help [command]` for more information about a command")
-				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `snipe`", false)
+				.setDescription("use `" + prefix + "help [command]` for more information about a command")
+				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `snipe`, `setprefix`", false)
 				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
 				.addField("blackjack", "21", false)
 				.addField("sniping", "you first", false)
@@ -49,7 +51,7 @@ public class Help implements CommandInterface{
 		// Create a custom embed for the command
 		embed
 			.setTitle(cmd.getName())
-			.setDescription(cmd.getHelp());
+			.setDescription(cmd.getHelp(prefix));
 		
 		channel.sendMessageEmbeds(embed.build()).queue();
 		
@@ -59,7 +61,7 @@ public class Help implements CommandInterface{
 		return "help";
 	}
 
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "bro";
 	}
 

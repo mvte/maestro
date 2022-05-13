@@ -46,7 +46,7 @@ public class Leave implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "have maestro leave your voice channel";
 	}
 

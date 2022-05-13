@@ -5,6 +5,7 @@ import java.util.List;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
@@ -14,7 +15,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Remove implements CommandInterface {
-
+	
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		final TextChannel channel = event.getTextChannel();
@@ -90,8 +91,8 @@ public class Remove implements CommandInterface {
 	
 	
 	@Override
-	public String getHelp() {
-		return "removes the *nth* track in the queue\n m.remove `[n]`";
+	public String getHelp(String prefix) {
+		return "removes the *nth* track in the queue\n " + prefix + "remove `[n]`";
 	}
 
 }

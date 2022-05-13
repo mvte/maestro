@@ -22,7 +22,7 @@ public class Micaela implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "tells you about micaela :D";
 	}
 	

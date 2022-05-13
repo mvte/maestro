@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import maestro.Bot;
+import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -13,14 +14,15 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Play implements CommandInterface {
-
+	
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		final TextChannel channel = event.getTextChannel();
+		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		// Check for search arguments
 		if(args.isEmpty()) {
-			channel.sendMessage("you need to provide a youtube link or search query!\ntry `" + Bot.prefix + "play [link/query]`").queue();
+			channel.sendMessage("you need to provide a youtube link or a search query\ntry `" + prefix + "play [link/query]`").queue();
 			return;
 		}
 		
@@ -34,7 +36,7 @@ public class Play implements CommandInterface {
 			Join j = new Join();
 			j.handle(event, args);
 		} else if(!memberState.getChannel().equals(selfVoiceState.getChannel())) {
-			channel.sendMessage("you need to be in the same voice channel as me.").queue();
+			channel.sendMessage("you need to be in the same voice channel as me").queue();
 			return;
 		}
 		
@@ -55,8 +57,8 @@ public class Play implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
-		return "plays a song given a youtube link or search query\nusage: " + Bot.prefix + "play `[link/query]`\n";
+	public String getHelp(String prefix) {
+		return "plays a song given a youtube link or search query\nusage: " + prefix + "play `[link/query]`\n";
 	}
 	
 	/**

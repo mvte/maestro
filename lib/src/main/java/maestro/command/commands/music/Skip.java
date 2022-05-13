@@ -60,7 +60,7 @@ public class Skip implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "skips to next track in queue";
 	}
 	

@@ -57,7 +57,7 @@ public class NowPlaying implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "displays the song that is currently playing";
 	}
 	

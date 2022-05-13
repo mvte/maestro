@@ -52,7 +52,7 @@ public class Pause implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "pauses the current track, or resumes it if already paused";
 	}
 	

@@ -45,7 +45,7 @@ public class Stop implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "stops current song and clears the queue";
 	}
 

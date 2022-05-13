@@ -22,9 +22,10 @@ public interface CommandInterface {
 	
 	/**
 	 * Returns the help message when b.[command] help is called
+	 * @param prefix the server's prefix
 	 * @return help message
 	 */
-	String getHelp();
+	String getHelp(String prefix);
 	
 	
 

@@ -8,8 +8,23 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import maestro.command.CommandInterface;
-import maestro.command.commands.*;
-import maestro.command.commands.music.*;
+import maestro.command.admin.SetPrefix;
+import maestro.command.commands.Blackjack;
+import maestro.command.commands.Hello;
+import maestro.command.commands.Help;
+import maestro.command.commands.Micaela;
+import maestro.command.commands.Ping;
+import maestro.command.commands.Snipe;
+import maestro.command.commands.music.Join;
+import maestro.command.commands.music.Leave;
+import maestro.command.commands.music.NowPlaying;
+import maestro.command.commands.music.Pause;
+import maestro.command.commands.music.Play;
+import maestro.command.commands.music.Queue;
+import maestro.command.commands.music.Remove;
+import maestro.command.commands.music.Repeat;
+import maestro.command.commands.music.Skip;
+import maestro.command.commands.music.Stop;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -38,6 +53,7 @@ public class CommandManager {
 		addCommand(new Repeat());
 		addCommand(new Remove());
 		addCommand(new Pause());
+		addCommand(new SetPrefix());
 	}
 
 	private void addCommand(CommandInterface cmd) {
@@ -67,10 +83,10 @@ public class CommandManager {
 		return null;
 	}
 
-	void handle(MessageReceivedEvent event) {
+	void handle(MessageReceivedEvent event, String prefix) {
 		// Splits the command into its constituent parts, without the command prefix
 		// (the command is the first argument)
-		String[] split = event.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(Bot.prefix), "")
+		String[] split = event.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(prefix), "")
 				.split("\\s+");
 
 		// The command being invoked

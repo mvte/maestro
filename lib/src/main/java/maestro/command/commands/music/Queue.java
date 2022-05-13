@@ -84,7 +84,7 @@ public class Queue implements CommandInterface {
 	}
 
 	@Override
-	public String getHelp() {
+	public String getHelp(String prefix) {
 		return "displays all the songs in the queue";
 	}
 

@@ -34,6 +34,7 @@ public class Stop implements CommandInterface {
 		}
 		
 		final GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+		manager.scheduler.repeating = false;
 		manager.scheduler.player.stopTrack();
 		manager.scheduler.queue.clear();
 		channel.sendMessage("maestro player has stopped").queue();

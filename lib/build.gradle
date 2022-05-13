@@ -1,0 +1,28 @@
+plugins {
+  id("java")
+  id("application")
+  id("com.github.johnrengelman.shadow") version "6.0.0"
+}
+
+mainClassName = "maestro.Bot"
+
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+  maven { // on kotlin dsl use `maven("https://m2.dv8tion.net/releases")` instead
+      url "https://m2.dv8tion.net/releases"
+  }
+  maven {
+  	url "https://jitpack.io"
+  }
+}
+
+dependencies {
+  	implementation("net.dv8tion:JDA:5.0.0-alpha.11")
+  	implementation("com.github.sedmelluq:lavaplayer:PR650-SNAPSHOT")
+}
+
+compileJava.options.encoding = "UTF-8"

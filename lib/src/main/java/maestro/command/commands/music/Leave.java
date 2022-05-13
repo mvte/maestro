@@ -36,7 +36,7 @@ public class Leave implements CommandInterface {
 		final AudioChannel selfChannel = selfVoiceState.getChannel();
 		
 		audioManager.closeAudioConnection();
-		channel.sendMessage(":loud_sound: leaving **" + selfChannel.getName() + "**").queue();
+		channel.sendMessage("leaving :loud_sound: **" + selfChannel.getName() + "**").queue();
 		
 	}
 

@@ -3,6 +3,7 @@ package maestro.command.commands;
 import java.awt.Color;
 import java.util.List;
 
+import maestro.Bot;
 import maestro.CommandManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,7 +26,7 @@ public class Help implements CommandInterface{
 		if(args.isEmpty()) {
 			embed
 				.setTitle("| maestro help |")
-				.setDescription("use `m.help [command]` for more information about a command")
+				.setDescription("use `" + Bot.prefix + "help [command]` for more information about a command")
 				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `snipe`", false)
 				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
 				.addField("blackjack", "21", false)

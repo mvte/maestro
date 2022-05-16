@@ -27,7 +27,7 @@ public class PlayerManager {
 	private final AudioPlayerManager audioPlayerManager;
 	
 	/**
-	 * Ideally should be run once for every JDA instance of blackjack
+	 * Ideally should be run once for every JDA instance of maestro
 	 */
 	public PlayerManager() {
 		this.musicManagers = new HashMap<>();

@@ -1,6 +1,8 @@
 package maestro;
 
+import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -8,11 +10,10 @@ public class Listener extends ListenerAdapter{
 	
 	private final CommandManager manager = new CommandManager();
 	
-	
 	@Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
-        // We don't want to respond to other bots, or read the message if it's not a command, or read it if it's a webhook message.
+        // We don't want to respond to other bots or read it if it's a webhook message.
 		if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
 		
 		final long guildId = event.getGuild().getIdLong();
@@ -28,5 +29,13 @@ public class Listener extends ListenerAdapter{
 		if(event.getMessage().getContentRaw().startsWith(prefix))
 			manager.handle(event, prefix);
     }
+	
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		
+		if(event.getComponentId().startsWith("blackjack:")) {
+			BlackjackManager.getInstance().handleButtonPress(event);
+		}
+			
+	}
 	
 }

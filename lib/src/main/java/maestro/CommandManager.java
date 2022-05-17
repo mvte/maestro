@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
 import maestro.command.CommandInterface;
 import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
@@ -41,7 +43,7 @@ public class CommandManager {
 		addCommand(new Help(this));
 		addCommand(new Hello());
 		addCommand(new Micaela());
-		addCommand(new Blackjack());
+		addCommand(new Blackjack());	//any command that may use a waiter should take it as a parameter 
 		addCommand(new Snipe());
 		addCommand(new Join());
 		addCommand(new Leave());
@@ -62,7 +64,7 @@ public class CommandManager {
 		boolean exists = this.commands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
 
 		if (exists)
-			throw new IllegalArgumentException("This command already exists");
+			throw new IllegalArgumentException("this command already exists");
 
 		commands.add(cmd);
 	}

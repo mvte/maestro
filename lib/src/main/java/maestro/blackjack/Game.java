@@ -9,36 +9,39 @@ import maestro.blackjack.objects.Card;
 import maestro.blackjack.objects.Deck;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class Game {
 	
 	/**
 	 * TODO
-	 * - double down (+ logic)
+	 * - double down (+ logic) 
 	 * 		- player should only be able to double down if they have enough money
 	 * 		- you probably have to figure out actionrows
 	 * 		- double down button should be disabled if player cannot double down
 	 * - insurance bets
 	 * 		- when dealer gets an ace, players should be allowed to bet insurance
-	 * - 7 card charlie
+	 * - 7 card charlie (DONE)
 	 * 		- when a player manages to get dealt 7 cards, they are compensated with an award
 	 * - split hand
 	 * 		- when a player is dealt two cards of the same face, they should be allowed to split hands (if they choose)
+	 * 		- idk abt doing this, super difficult
 	 * - fix the ui
 	 * 		- maybe adding a long -------------------- will help
 	 * 		- space it in between certain messages
-	 * - tell the user that he must click the hit button again if he wishes to continue hitting
+	 * 			- these should be placed at the end of every player's turn (bust, stand, blackjack, etc.)
+	 * 		- add thumbnails so it's not so empty
+	 * - tell the user that he must click the hit button again if he wishes to continue hitting (DONE)
 	 * - minimize lag, or add a typing queue where it happens
-	 * - replace getEffectiveName() with getEffectiveName() (just in case the user has no nickname)
+	 * - replace getNickname() with getEffectiveName() (just in case the user has no nickname) (DONE)
 	 * 
 	 * memory
-	 * 	there is a memory issue for games that run for extremely long times, as the game is built by calling methods within methods
+	 * 	there may be a memory issue for games that run for extremely long times, as the game is built by calling methods within methods
 	 * 	if these methods don't return, the memory will never be reclaimed from the methods that were called previously
 	 * 	idk how to fix this lmao
 	 * 		(design the game better?)
@@ -60,6 +63,7 @@ public class Game {
 	
 	//treat this like the actual game
 	public void run(boolean first) {
+		
 		dealer = new Player();
 		
 		if(!first) {
@@ -73,20 +77,8 @@ public class Game {
 		
 	}
 	
-//	void initialize(boolean first) {
-//		dealer = new Player();
-//		
-//		if(!first) {
-//			player.resetHand();
-//		}
-//		
-//		setBets();
-//		dealToPlayers();
-//		
-//	}
-	
 	/**
-	 * Takes input from a player to 
+	 * Takes input from a player to determine their bet
 	 * @param player The player we're accepting 
 	 */
 	private void setBet(Player player) {
@@ -98,7 +90,7 @@ public class Game {
 		
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("current balances")
-				.addField(player.getName(), String.format("$%.2f", player.getCash()), false);
+				.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), String.format("$%.2f", player.getCash()), false);
 		channel.sendMessageEmbeds(eb.build()).queue();
 		
 		channel.sendMessage(player.getUser().getAsMention() + ", please enter your bet").queue();
@@ -159,7 +151,19 @@ public class Game {
 			dealer.getHand().add(dealingCard);
 		}		
 		
+		//if dealer has blackjack, than none of the players should be allowed to play
+		if(dealer.getHand().get(0).getValue() == 11 || dealer.getHand().get(0).getValue() == 10) {
+			channel.sendMessage("dealer is checking down facing card...").queue();
+		}
 		
+		if(dealer.hasBlackjack()) {
+			channel.sendMessage("dealer has blackjack!").queue();
+			channel.sendMessage("===========================================================").queue();
+			payout(player);
+			return;
+		}
+		
+		channel.sendMessage("===========================================================").queue();
 		turn(player);
 	}
 	
@@ -171,20 +175,39 @@ public class Game {
 		EmbedBuilder eb = new EmbedBuilder()
 			.setTitle(channel.getGuild().getMember(p.getUser()).getEffectiveName() + "'s turn")
 			.addField("current hand", p.getHand().toString(), false)
-			.addField("hand value", p.getHand().value() + "", false);
+			.addField("hand value", p.getHand().value() + "", false)
+			.setFooter("use these buttons to indicate your decision");
 		
-		channel.sendMessageEmbeds(eb.build()).setActionRow(Button.primary("blackjack:hitbutton", "hit"), Button.secondary("blackjack:standbutton", "stand")).queue( m ->
-		waiter.waitForEvent(ButtonInteractionEvent.class, 
-			(e) -> {
-				return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == m.getIdLong();
-			},
-			(e) -> {
-				e.deferEdit().queue();
-				play(p, e);
-				
-				//call next method or call this method again (for a different player)
-				
-			}, 30, TimeUnit.SECONDS, () -> channel.sendMessage("you took too long (hitting)").queue()));
+		
+		//if the player is dealt a blackjack immediately, no need to prompt for hit or stand
+		if(p.getHand().value() == 21) {
+			channel.sendMessageEmbeds(eb.build()).queue();
+			channel.sendMessage(player.getUser().getAsMention() + "has blackjack!").queue();
+			channel.sendMessage("===========================================================").queue();
+			dealerTurn(p);
+			
+			return;
+		}
+		
+		ActionRow ar;
+		if(p.getWager() <= p.getCash()) {
+			ar = ActionRow.of(Button.primary("blackjack:hitbutton", "hit"), Button.secondary("blackjack:standbutton", "stand"), Button.secondary("blackjack:doubledownbutton", "double down"));
+		} else {
+			ar = ActionRow.of(Button.primary("blackjack:hitbutton", "hit"), Button.secondary("blackjack:standbutton", "stand"));
+		}
+
+		channel.sendMessageEmbeds(eb.build()).setActionRows(ar)
+			.queue( m -> 
+				waiter.waitForEvent(ButtonInteractionEvent.class, 
+					(e) -> {
+						return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == m.getIdLong();
+					},
+					(e) -> {
+						play(p, e);
+						
+						//call next method or call this method again (for a different player)
+						
+					}, 30, TimeUnit.SECONDS, () -> channel.sendMessage("you took too long (hitting)").queue()));
 			
 	}
 	
@@ -192,32 +215,70 @@ public class Game {
 	private void play(Player player, ButtonInteractionEvent event) {
 		//recursively call play until the player busts or stands
 		if(event.getComponentId().equals("blackjack:standbutton")) {
+			event.editComponents().queue();
 			channel.sendMessage(player.getUser().getAsMention() + " stands").queue();
+			channel.sendMessage("===========================================================").queue();
+			dealerTurn(player);
+			return;
+		}
+		
+		if(event.getComponentId().equals("blackjack:doubledownbutton")) {
+			event.editComponents().queue();
+			
+			channel.sendMessage(player.getUser().getAsMention() + "doubles down").queue();
+			player.doubleWager();
+			
+			Card dealingCard = deck.deal();
+			player.addToHand(dealingCard);
+			channel.sendMessage("dealing to " + player.getUser().getAsMention() + ": " + dealingCard + "\nhand value: " + player.getHand().value()).queue();
+			
+			if(player.getHand().value() > 21 )
+				channel.sendMessage(player.getUser().getAsMention() + " busts").queue();
+			
+			if(player.getHand().value() == 21)
+				channel.sendMessage(player.getUser().getAsMention() + " has blackjack!").queue();
+			
+			channel.sendMessage("===========================================================").queue();
 			dealerTurn(player);
 			return;
 		}
 		
 		if(event.getComponentId().equals("blackjack:hitbutton")) {
+			
 			Card dealingCard = deck.deal();
 			player.getHand().add(dealingCard);
-			channel.sendMessage("dealing to " + player.getUser().getAsMention() + ": " + dealingCard.toString()).queue();
-			channel.sendMessage("hand value: " + player.getHand().value()).queue();
+			channel.sendMessage("dealing to " + player.getUser().getAsMention() + ": " + dealingCard + "\nhand value: " + player.getHand().value()).queue();
+			
+			if(player.getHand().size() == 7 && player.getHand().value() <= 21) {
+				event.editComponents().queue();
+				channel.sendMessage(player.getUser().getAsMention() + " has a 7 card charlie!").queue();
+				channel.sendMessage("===========================================================").queue();
+				dealerTurn(player);
+				return;
+			}
 			
 			if(player.getHand().value() > 21) {
+				event.editComponents().queue();
 				channel.sendMessage(player.getUser().getAsMention() + " busts").queue();
 				//if playerNode.next != null
 				//	call turn(p) for that player, otherwise it is the dealer's turn
+				channel.sendMessage("===========================================================").queue();
 				dealerTurn(player);
 				return;
 			}
 			
 			if(player.getHand().value() == 21) {
+				event.editComponents().queue();
 				channel.sendMessage(player.getUser().getAsMention() + " has blackjack!").queue();
 				//if playerNode.next != null
 				//	call turn(p) for that player, otherwise it is the dealer's turn
+				channel.sendMessage("===========================================================").queue();
 				dealerTurn(player);
 				return;
 			}
+			
+			ActionRow ar = ActionRow.of(Button.primary("blackjack:hitbutton", "hit"), Button.secondary("blackjack:standbutton", "stand"));
+			event.editComponents(ar).queue();
 			
 			//wait for another hit or stand (then call this method again)
 			waiter.waitForEvent(ButtonInteractionEvent.class, 
@@ -239,9 +300,9 @@ public class Game {
 		channel.sendMessageEmbeds(eb.build()).queue();
 		channel.sendMessage("dealer's down card is... " + dealer.getHand().get(1) + "\nhand value: " + dealer.getHand().value()).queue();
 		
-		//the dealer deals until their hand is greater than 17
+		//the dealer deals until their hand is greater than or equal to 17
 		Card dealingCard;
-		while(dealer.getHand().value() < 17) {
+		while(dealer.getHand().value() <= 17) {
 			dealingCard = deck.deal();
 			dealer.addToHand(dealingCard);
 			channel.sendMessage("dealing to DEALER: " + dealingCard + "\nhand value: " + dealer.getHand().value()).queue();
@@ -256,6 +317,7 @@ public class Game {
 			 channel.sendMessage("dealer stands!").queue();
 		}
 		
+		channel.sendMessage("===========================================================").queue();
 		payout(player);
 	}
 	
@@ -287,28 +349,29 @@ public class Game {
 	 */
 	private String evaluatePay(Player p) {
 		String result = "";
+		String name = channel.getGuild().getMember(p.getUser()).getEffectiveName();
 		
 		if(p.getHand().value() > 21) {
-			result = p.getName() + " has busted. (-$" + p.getWager() + ")";
+			result = name + " has busted. (-$" + p.getWager() + ")";
 		}else if(dealer.getHand().value() > 21) {
 			if(!p.hasBlackjack()) {
-				result = "dealer has busted. " + p.getName() + " has won. (+$" + p.getWager() + ")";
+				result = "dealer has busted. " + name + " has won. (+$" + p.getWager() + ")";
 				p.addCash(p.getWager()*2);
 			}else {
-				result = "dealer has busted. " + p.getName() + " has won with blackjack. (+$" + p.getWager()*1.5 + ")";
+				result = "dealer has busted. " + name + " has won with blackjack. (+$" + p.getWager()*1.5 + ")";
 				p.addCash(p.getWager()*2.5);
 			}
 		}else if(p.getHand().value() == dealer.getHand().value()) {
-			result = p.getName() + " pushes. (+$0)";
+			result = name + " pushes. (+$0)";
 			p.addCash(p.getWager());
 		}else if(p.hasBlackjack()) {
-			result = p.getName() + " has won with blackjack. (+$" + (p.getWager()*1.5) + ")";
+			result = name + " has won with blackjack. (+$" + (p.getWager()*1.5) + ")";
 			p.addCash(p.getWager()*2.5);
 		}else if(p.getHand().value() > dealer.getHand().value() || p.getHand().size() == 7) {
-			result = p.getName() + " has won. (+$" + p.getWager() + ")";
+			result = name + " has won. (+$" + p.getWager() + ")";
 			p.addCash(p.getWager()*2);
 		}else if(p.getHand().value() < dealer.getHand().value()) {
-			result = p.getName() + " has lost. (-$" + p.getWager() + ")";
+			result = name + " has lost. (-$" + p.getWager() + ")";
 		}
 		
 		return result;
@@ -319,7 +382,9 @@ public class Game {
 		
 		if(player.getCash() == 0) {
 			channel.sendMessage("you have no money left, ending game...").queue();
+			channel.sendMessage("===========================================================").queue();
 			stop();
+			return;
 		}
 			eb.setTitle("round has ended")
 				.setDescription("do you wish to continue?");
@@ -332,27 +397,31 @@ public class Game {
 			if(e.getComponentId().equals("blackjack:continuebutton")) {
 				e.editComponents().queue();
 				channel.sendMessage("continuing game").queue();
+				channel.sendMessage("===========================================================").queue();
 				run(false);
 				return;
 			}
 			
 			if(e.getComponentId().equals("blackjack:end_game_button")) {
 				e.editComponents().queue();
+				channel.sendMessage("===========================================================").queue();
 				stop();
 				return;
 			}
 			
 		}, 30, TimeUnit.SECONDS, () -> {
 			channel.sendMessage("received no response, stopping game").queue();
+			channel.sendMessage("===========================================================").queue();
 			stop();
 		}));
 	}
 	
 	public void stop() {
 		started = false;
+		BlackjackManager.getInstance().getGameManager(channel.getGuild()).started = false;
 		
 		EmbedBuilder eb = new EmbedBuilder()
-				.setTitle("thanks for playing blackjack <3")
+				.setTitle("thanks for playing blackjack")
 				.setDescription("here's how you did")
 				.setFooter("by mute | https://github.com/mvte");
 		

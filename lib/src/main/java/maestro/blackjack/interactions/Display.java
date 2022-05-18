@@ -24,7 +24,8 @@ public class Display implements Interaction {
 		.addField("rules", "use google", false)
 		.addField("commands", "`start` begins a game of blackjack\n" /*+ 
 				"`stop` stops an ongoing game of blackjack (you must have admin privileges). if you created a game and you wish to stop it, you must do so after a round is finished\n"*/, false)
-		.setFooter("by mute | https://github.com/mvte");
+		.setFooter("by mute | https://github.com/mvte")
+		.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
 		channel.sendMessageEmbeds(embed.build()).queue();
 	}

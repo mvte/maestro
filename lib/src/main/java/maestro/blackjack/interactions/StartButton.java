@@ -22,7 +22,8 @@ public class StartButton implements Interaction {
 		
 		started = true;
 		eb.setTitle("welcome to blackjack").setDescription(":white_check_mark: game has started")
-			.setFooter("maestro may take a while to respond, please be patient");
+			.setFooter("maestro may take a while to respond, please be patient")
+			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		event.editComponents().queue();
 		channel.sendMessageEmbeds(eb.build()).queue();
 		

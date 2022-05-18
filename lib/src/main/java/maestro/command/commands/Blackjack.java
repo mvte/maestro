@@ -20,8 +20,8 @@ public class Blackjack implements CommandInterface {
 
 	@Override
 	public String getHelp(String prefix) {
-		return "displays the blackjack menu with all information you need about the game blackjack" +
-					"usage: " + prefix + ".blackjack `[command]`\n" +
+		return "displays the blackjack menu with all information you need about the game blackjack\n" +
+					"usage: " + prefix + "blackjack `[command]`\n" +
 					"`start` begins a game of blackjack";
 	}
 

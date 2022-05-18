@@ -11,6 +11,7 @@ public class Player {
 	private User user;
 	private String name;
 	private double sideBet;
+	private boolean isSplit = false;
 	
 	public Player() {
 		hand = new Hand();
@@ -84,7 +85,7 @@ public class Player {
 	}
 
 	//returns the players split hand
-	public Player splitHand() {
+	public Player getSplitHand() {
 		return splitHand;
 	}
 
@@ -92,11 +93,16 @@ public class Player {
 	public void splitPlayerHand() {
 		cash-=wager;
 		splitHand = new Player(cash, user);
+		splitHand.isSplit = true;
 		splitHand.setName(user.getName() + "'s split hand");
 		splitHand.setWager(wager);
 		
 		
 		splitHand.addToHand(hand.remove(1));
+	}
+	
+	public boolean isSplitHand() {
+		return isSplit;
 	}
 	
 	public void setName(String name) {

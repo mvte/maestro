@@ -18,8 +18,9 @@ public class Start implements Interaction {
 		
 		embed.setTitle("| starting a game of blackjack |")
 		.setDescription("press the start button to start a game of blackjack, or press cancel to cancel")
-		.addField("settings", "a normal game of blackjack\n(custom settings coming soon)", false)
-		.setFooter("by mute | https://github.com/mvte");
+		.addField("settings", "starting cash: `1000`\nnumber of decks: `8`\nseven card charlie: `true`\nsplit hands: `false`\ninsurance bets: `true`\n", false)
+		.setFooter("by mute | https://github.com/mvte")
+		.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
 		channel.sendMessageEmbeds(embed.build()).setActionRow(Button.success("blackjack:startbutton", "start"), Button.danger("blackjack:cancelbutton", "cancel")).queue();
 		return;

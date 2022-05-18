@@ -33,7 +33,8 @@ public class Help implements CommandInterface{
 				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
 				.addField("blackjack", "21", false)
 				//.addField("sniping", "you first", false)
-				.setFooter("by mute | https://github.com/mvte");
+				.setFooter("by mute | https://github.com/mvte")
+				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 			
 			channel.sendMessageEmbeds(embed.build()).queue();
 			return;
@@ -51,7 +52,8 @@ public class Help implements CommandInterface{
 		// Create a custom embed for the command
 		embed
 			.setTitle(cmd.getName())
-			.setDescription(cmd.getHelp(prefix));
+			.setDescription(cmd.getHelp(prefix))
+			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
 		channel.sendMessageEmbeds(embed.build()).queue();
 		

@@ -15,7 +15,7 @@ public class GuildGameManager {
 	
 	public void beginGame(TextChannel channel, User user) {
 		this.channel = channel;
-		game = new Game(8, channel, user);
+		game = new Game(6, channel, user);
 		game.started = true;
 		this.started = game.started;
 		

@@ -31,6 +31,7 @@ public class Bot {
 			.setActivity(Activity.playing("cards"))
 			.addEventListeners(new Listener(), waiter)
 			.build();
+		
 	}
 	
 	

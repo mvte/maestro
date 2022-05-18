@@ -49,9 +49,9 @@ public class Hand {
 	
 	//displays all cards in the hand
 	public String toString() {
-		String result = "";
+		String result = "\\| ";
 		for(Card c: cards) {
-			result += c + " \\|\\| ";
+			result += c + " \\| ";
 		}
 		return result;
 	}

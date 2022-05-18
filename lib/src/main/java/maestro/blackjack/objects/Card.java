@@ -61,7 +61,7 @@ public class Card {
 	
 	//e.g. ACE of SPADES
 	public String toString() {
-		return getValueString() + " of " +  getSuit();
+		return "*" + getValueString() + " of " +  getSuit() + "*";
 	}
 
 }

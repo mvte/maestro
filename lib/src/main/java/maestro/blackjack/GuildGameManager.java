@@ -22,10 +22,12 @@ public class GuildGameManager {
 	}
 	
 	public void beginGame(TextChannel channel) {
+		
 		this.channel = channel;
 		game = new Game(6, channel, players);
 		game.started = true;
 		this.started = game.started;
+		
 		
 		game.run(true);
 	}
@@ -44,6 +46,8 @@ public class GuildGameManager {
 		
 		game.started = false;
 		this.started = false;
+		nullGame();
+		
 		eb.setTitle(":x: game stopped");
 		this.channel.sendMessageEmbeds(eb.build()).queue();
 	}
@@ -54,6 +58,15 @@ public class GuildGameManager {
 	
 	public ArrayList<Player> getPlayers() {
 		return players;
+	}
+	
+	/**
+	 * nullifies the game instance to ensure a proper game end
+	 * i also have to empty this list 
+	 */
+	public void nullGame() {
+		players.removeAll(players);
+		game = null;
 	}
 	
 

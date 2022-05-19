@@ -21,6 +21,7 @@ public class CancelButton implements Interaction {
 			channel.sendMessage("you cannot cancel an in progress game").queue();
 			return;
 		}
+		gameManager.nullGame();
 		
 		eb.setTitle(":x: game canceled!").setDescription("use `" + prefix + "blackjack start` to start a game");
 		event.editComponents().queue();

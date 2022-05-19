@@ -21,7 +21,7 @@ public class Game {
 	
 	/**
 	 * TODO
-	 * - multiplayer!! 
+	 * - multiplayer!! (DONE :D)
 	 * 		- revelation: the game is built like a circle, where each method calls another and another until it calls the first method again restarting the loop
 	 * 			- therefore, if we deviate from the circle, we must return to the circle to keep the game going
 	 * 				- this logic can be applied to the split hands
@@ -41,13 +41,13 @@ public class Game {
 	 * 			- these should be placed at the end of every player's turn (bust, stand, blackjack, etc.)
 	 * 		- add thumbnails so it's not so empty
 	 * - tell the user that he must click the hit button again if he wishes to continue hitting (DONE)
-	 * - minimize lag, or add a typing queue where it happens
+	 * - minimize lag, or add a typing queue where it happens (idk if this is possible)
 	 * - replace getNickname() with getEffectiveName() (just in case the user has no nickname) (DONE)
-	 * - fix splithand and insurance bet compatibility (done?)
+	 * - fix splithand and insurance bet compatibility (DONE)
 	 * 		- separate the split situation into it's own method, and call it in both dealToPlayers() and insuranceSituation()
 	 * - game doesn't stop properly when stop command is called
 	 * - split hand has to remove itself from linked list (this means you have to keep track of prev node) (DONE)
-	 * - clear linkedlist when game finishes 
+	 * - clear linkedlist when game finishes (DONE)
 	 * - when all players have ran out of money, async bugs occur (fixed)
 	 * - if a game is occuring on two servers, the bot will take the same input from the same person on both servers
 	 * 
@@ -218,8 +218,10 @@ public class Game {
 			if(eligible) {
 				channel.sendMessage("the dealer has been dealt an ace, some players are eligible for insurance").queue();
 				insuranceSituation(firstPlayerNode);
+				return;
 			}
 			
+			splitSituation(firstPlayerNode);
 			return;
 		}
 		
@@ -303,6 +305,7 @@ public class Game {
 			else
 				insuranceSituation(playerNode.next);
 			return;
+			
 		}
 		double maxSideBet = Math.min(player.getCash(), player.getWager()*0.5);
 		channel.sendMessageFormat("%s, how much would you like to bet insurance? ($0.00-$%.2f)", player.getUser().getAsMention(), maxSideBet).queue();
@@ -350,7 +353,6 @@ public class Game {
 				
 				//if playerNode.next == null and dealer has no blackjack, begin turns, otherwise, insurance bet for next player
 				insuranceSituation(playerNode.next);
-				
 				return;
 			}, 30, TimeUnit.SECONDS, () -> {
 				channel.sendMessage("you took too long betting, no side bet set");
@@ -364,6 +366,7 @@ public class Game {
 						payout();     
 						return;
 					}
+					
 					turn(firstPlayerNode);
 					return;
 				}
@@ -371,7 +374,6 @@ public class Game {
 				//if playerNode.next == null and dealer has no blackjack, begin turns, otherwise, insurance bet for next player
 				insuranceSituation(playerNode.next);
 		});
-	
 			
 	}
 
@@ -764,8 +766,11 @@ public class Game {
 			//should also save to database here (if you do add it)
 		}
 			
-		this.players = new LinkedList();
 		channel.sendMessageEmbeds(eb.build()).queue();
+		
+		this.players = new LinkedList();
+		firstPlayerNode = null;
+		BlackjackManager.getInstance().getGameManager(channel.getGuild()).nullGame();
 	}
 	
 }

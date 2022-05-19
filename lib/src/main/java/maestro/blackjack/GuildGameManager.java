@@ -1,5 +1,8 @@
 package maestro.blackjack;
 
+import java.util.ArrayList;
+
+import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -12,10 +15,15 @@ public class GuildGameManager {
 	private Game game;
 	private TextChannel channel;
 	public boolean started = false;
+	private ArrayList<Player> players;
 	
-	public void beginGame(TextChannel channel, User user) {
+	public GuildGameManager() {
+		players = new ArrayList<>();
+	}
+	
+	public void beginGame(TextChannel channel) {
 		this.channel = channel;
-		game = new Game(6, channel, user);
+		game = new Game(6, channel, players);
 		game.started = true;
 		this.started = game.started;
 		
@@ -38,6 +46,14 @@ public class GuildGameManager {
 		this.started = false;
 		eb.setTitle(":x: game stopped");
 		this.channel.sendMessageEmbeds(eb.build()).queue();
+	}
+	
+	public void addPlayer(Player player) {
+		players.add(player);
+	}
+	
+	public ArrayList<Player> getPlayers() {
+		return players;
 	}
 	
 

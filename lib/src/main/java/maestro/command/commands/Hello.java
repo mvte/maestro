@@ -13,7 +13,7 @@ public class Hello implements CommandInterface {
 		TextChannel channel = event.getTextChannel();
 		User user = event.getAuthor();
 		
-		channel.sendMessage("hello ***" + user.getName() + "***, how are you :D").queue();
+		channel.sendMessage("hello ***" + event.getGuild().getMember(user).getEffectiveName() + "***, how are you :D").queue();
 	}
 
 	public String getName() {

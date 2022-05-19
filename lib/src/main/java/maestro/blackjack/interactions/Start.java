@@ -2,6 +2,9 @@ package maestro.blackjack.interactions;
 
 import java.util.List;
 
+import maestro.blackjack.BlackjackManager;
+import maestro.blackjack.GuildGameManager;
+import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -17,12 +20,15 @@ public class Start implements Interaction {
 		EmbedBuilder embed = new EmbedBuilder();
 		
 		embed.setTitle("| starting a game of blackjack |")
-		.setDescription("press the start button to start a game of blackjack, or press cancel to cancel")
+		.setDescription("wait for others to join using the join button or play a game by yourself. press start when you're ready, or cancel to cancel.")
 		.addField("settings", "starting cash: `1000`\nnumber of decks: `6`", false)
 		.setFooter("by mute | https://github.com/mvte")
 		.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
-		channel.sendMessageEmbeds(embed.build()).setActionRow(Button.success("blackjack:startbutton", "start"), Button.danger("blackjack:cancelbutton", "cancel")).queue();
+		GuildGameManager gameManager = BlackjackManager.getInstance().getGameManager(event.getGuild());
+		gameManager.addPlayer(new Player(1000, event.getAuthor()));
+		
+		channel.sendMessageEmbeds(embed.build()).setActionRow(Button.success("blackjack:startbutton", "start"), Button.danger("blackjack:cancelbutton", "cancel"), Button.secondary("blackjack:join_button", "join")).queue();
 		return;
 	}
 	

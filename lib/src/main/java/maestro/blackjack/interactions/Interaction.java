@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public interface Interaction {
 	
-	//not sure if i need this
-	public boolean textCommand = false;
 	
 	/**
 	 * Override if the interaction is a blackjack button

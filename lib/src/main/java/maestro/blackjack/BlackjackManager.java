@@ -8,6 +8,7 @@ import java.util.Map;
 import maestro.blackjack.interactions.CancelButton;
 import maestro.blackjack.interactions.Display;
 import maestro.blackjack.interactions.Interaction;
+import maestro.blackjack.interactions.JoinButton;
 import maestro.blackjack.interactions.Start;
 import maestro.blackjack.interactions.StartButton;
 import maestro.blackjack.interactions.Stop;
@@ -35,7 +36,7 @@ public class BlackjackManager {
 		addInteraction(new Start());
 		addInteraction(new CancelButton());
 		addInteraction(new Stop());
-		
+		addInteraction(new JoinButton());
 	}
 	
 	public GuildGameManager getGameManager(Guild guild) {

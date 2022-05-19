@@ -7,8 +7,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
 import maestro.command.CommandInterface;
 import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
@@ -17,6 +15,7 @@ import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
 import maestro.command.commands.Ping;
 import maestro.command.commands.Snipe;
+import maestro.command.commands.math.ApproximatePi;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
@@ -56,6 +55,7 @@ public class CommandManager {
 		addCommand(new Remove());
 		addCommand(new Pause());
 		addCommand(new SetPrefix());
+		addCommand(new ApproximatePi());
 	}
 
 	private void addCommand(CommandInterface cmd) {

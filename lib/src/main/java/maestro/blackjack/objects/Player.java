@@ -127,4 +127,8 @@ public class Player {
 		sideBet = 0;
 	}
 	
+	public boolean equals(Player cmp) {
+		return cmp.getUser().equals(this.getUser());
+	}
+	
 }

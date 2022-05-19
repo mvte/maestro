@@ -1,22 +1,20 @@
 package maestro.blackjack;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import maestro.Bot;
+import maestro.blackjack.LinkedList.Node;
 import maestro.blackjack.objects.Card;
 import maestro.blackjack.objects.Deck;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class Game {
@@ -45,9 +43,13 @@ public class Game {
 	 * - tell the user that he must click the hit button again if he wishes to continue hitting (DONE)
 	 * - minimize lag, or add a typing queue where it happens
 	 * - replace getNickname() with getEffectiveName() (just in case the user has no nickname) (DONE)
-	 * - fix splithand and insurance bet compatibility
-	 * 		- separate the split situation into it's own method, and call it in both turn() and insuranceSituation()
+	 * - fix splithand and insurance bet compatibility (done?)
+	 * 		- separate the split situation into it's own method, and call it in both dealToPlayers() and insuranceSituation()
 	 * - game doesn't stop properly when stop command is called
+	 * - split hand has to remove itself from linked list (this means you have to keep track of prev node) (DONE)
+	 * - clear linkedlist when game finishes 
+	 * - when all players have ran out of money, async bugs occur (fixed)
+	 * - if a game is occuring on two servers, the bot will take the same input from the same person on both servers
 	 * 
 	 * NOTES
 	 * memory
@@ -69,20 +71,24 @@ public class Game {
 	 * 			similarly, you can also insert the split node after the current player node
 	 * 				but you've already implemented split hands using a convoluted system of booleans so... if it ain't broke don't fix it	
 	 * 					(actually, this might solve your insurance system compatibility)
+	 * 		to be able to have access to the nodes of a linked list, you have to code your own linkedlist class
+	 * 
+	 * 
 	 *
 	 */
 	
+	private LinkedList players;
+	private Node firstPlayerNode;
 	private Deck deck;
-	private Player player;
 	private Player dealer;
 	private TextChannel channel;
 	private EventWaiter waiter = Bot.waiter;
 	public boolean started = false;
 	
-	public Game(int numDecks, TextChannel channel, User user) {
-		channel.getGuild().retrieveMemberById(user.getId()).queue();
+	public Game(int numDecks, TextChannel channel, ArrayList<Player> players) {
+		this.players = new LinkedList(players);
+		firstPlayerNode = this.players.getHeadNode();
 		deck = new Deck(true, numDecks);
-		player = new Player(1000, user);
 		this.channel = channel;
 		dealer = new Player();
 	}
@@ -90,13 +96,21 @@ public class Game {
 	//treat this like the actual game
 	public void run(boolean first) {
 		dealer.resetHand();
+		EmbedBuilder eb = new EmbedBuilder();
 		
-		if(!first) {
-			player.resetHand();
+		
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) { 
+			ptr.getPlayer().resetHand();
+			eb.addField(channel.getGuild().getMember(ptr.getPlayer().getUser()).getEffectiveName(), String.format("$%.2f", ptr.getPlayer().getCash()), false);
 		}
 		
+		eb
+				.setTitle("current balances")
+				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
+		channel.sendMessageEmbeds(eb.build()).queue();
+		
 		//because of the way eventwaiter works, we need to have everything linked starting from this method
-		setBet(player);
+		setBet(firstPlayerNode);
 	
 		
 	}
@@ -105,23 +119,19 @@ public class Game {
 	 * Takes input from a player to determine their bet
 	 * @param player The player we're accepting 
 	 */
-	private void setBet(Player player) {
+	private void setBet(Node playerNode) {
 		//you should recursively call this method for every player in the game if you plan to add multiplayer
 		//	the players should be kept in a linked list
 		//something like
 		//	if(playerNode.next == null) nextMethod();
 		//  else setBet(playerNode.next());
 		
-		EmbedBuilder eb = new EmbedBuilder()
-				.setTitle("current balances")
-				.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), String.format("$%.2f", player.getCash()), false)
-				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
-		channel.sendMessageEmbeds(eb.build()).queue();
+		Player player = playerNode.getPlayer();
 		
 		channel.sendMessage(player.getUser().getAsMention() + ", please enter your bet").queue();
 		waiter.waitForEvent(MessageReceivedEvent.class, 
 			(e) -> {
-				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser())) {
+				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser()) || !e.getTextChannel().equals(channel)) {
 					return false;
 				}
 				
@@ -148,17 +158,23 @@ public class Game {
 			(e) -> {
 				double i = Double.parseDouble(e.getMessage().getContentRaw());
 				player.setWager(i);
-				dealToPlayers(player);
+				if(playerNode.next == null)
+					dealToPlayers();
+				else 
+					setBet(playerNode.next);
 			}, 30, TimeUnit.SECONDS, () -> {
-				channel.sendMessage("you took too long betting, default bet set (1)").queue();
-				player.setWager(1);
+				channel.sendMessage("you took too long betting, default bet set (0)").queue();
+				player.setWager(0);
 				//send to next method
-				dealToPlayers(player);
+				if(playerNode.next == null)
+					dealToPlayers();
+				else 
+					setBet(playerNode.next);
 			});
 		
 	}
 	
-	private void dealToPlayers(Player player) {
+	private void dealToPlayers() {
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("dealing")
 				.setDescription("maestro is dealing cards, please wait")
@@ -167,11 +183,15 @@ public class Game {
 		
 		//a card is dealt to every player once (including the dealer) before dealing the second card to all players
 		for(int i = 0; i < 2; i++) {
-			Card dealingCard = deck.deal();
+			Card dealingCard;
 			
 			//deal to player (for multiple players, you should loop)
-			channel.sendMessage("dealing to " + player.getUser().getAsMention() + ": " + dealingCard.toString()).queue();
-			player.getHand().add(dealingCard);
+			for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) {
+				dealingCard = deck.deal();
+				Player player = ptr.getPlayer();
+				channel.sendMessage("dealing to " + player.getUser().getAsMention() + ": " + dealingCard.toString()).queue();
+				player.getHand().add(dealingCard);
+			}
 			
 			//deal to dealer
 			dealingCard = deck.deal();
@@ -188,12 +208,18 @@ public class Game {
 			boolean eligible = false;
 			
 			//iterate through player list to determine eligibility
-			eligible = player.getCash() > player.getWager()*0.5;
+			for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) { 
+				Player player = ptr.getPlayer();	
+				
+				if(!eligible)		
+					eligible = player.getCash() > 0;
+			}
 			
-			if(eligible)
+			if(eligible) {
 				channel.sendMessage("the dealer has been dealt an ace, some players are eligible for insurance").queue();
+				insuranceSituation(firstPlayerNode);
+			}
 			
-			insuranceSituation(player);
 			return;
 		}
 		
@@ -206,18 +232,24 @@ public class Game {
 			channel.sendMessage(dealer.getHand().get(1).toString()).queue();
 			channel.sendMessage("dealer has blackjack!").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
-			payout(player);     
+			payout();     
 			return;
 		}
 		
 		channel.sendMessage("──────────────────────────────────────").queue();
+		splitSituation(firstPlayerNode);
+		
+	}
+	
+	private void splitSituation(Node playerNode) {
+		Player player = playerNode.getPlayer();
 		
 		//ask here what the player would like to do if they want to split hands
 		//	iterate through list for multiple players
 		if(player.canSplit()) {
 			EmbedBuilder ebSpl = new EmbedBuilder()
 					.setTitle("split hand")
-					.setDescription(channel.getGuild().getMember(player.getUser()).getEffectiveName() + ", you are able to split your hand. this split hand will have the same bet as your original bet. would you like to?")
+					.setDescription(channel.getGuild().getMember(player.getUser()).getEffectiveName() + ", you are able to split your hand. this split hand will have the same bet as your original bet. would you like to split?")
 					.setThumbnail(player.getUser().getAvatarUrl());
 			
 			channel.sendMessageEmbeds(ebSpl.build()).setActionRow(Button.success("blackjack:yes_split_button", "split"), Button.danger("blackjack:no_split_button", "no")).queue( m ->
@@ -230,30 +262,124 @@ public class Game {
 					if(e.getComponentId().equals("blackjack:yes_split_button")) {
 						player.splitPlayerHand();
 						channel.sendMessage(player.getUser().getAsMention() + " splits their hand\nsplit hand: " + player.getSplitHand().getHand().toString()).queue();
-						turn(player, true);
-						return;
+						Node splitNode = new Node(player.getSplitHand(), playerNode.next);
+						playerNode.next = splitNode;
+						splitNode.prev = playerNode;
+						
+						if(splitNode.next == null) 
+							turn(firstPlayerNode);
+						else
+							splitSituation(splitNode.next);
 					}
 					
 					if(e.getComponentId().equals("blackjack:no_split_button")) {
-						turn(player, false);
-						return;
+						if(playerNode.next == null) 
+							turn(firstPlayerNode);
+						else
+							splitSituation(playerNode.next);
 					}
 				}, 30, TimeUnit.SECONDS, () -> {
 					channel.sendMessage("you took too long, will not split hand").queue();
-					turn(player, false);
-					return;
+					if(playerNode.next == null) 
+						turn(firstPlayerNode);
+					else
+						splitSituation(playerNode.next);
 				}));
 		} else {
-			turn(player, false);
+			if(playerNode.next == null) 
+				turn(firstPlayerNode);
+			else
+				splitSituation(playerNode.next);
 		}
-		
-		
 	}
 	
-	private void turn(Player p, boolean split) {
+	private void insuranceSituation(Node playerNode) {
+		Player player = playerNode.getPlayer();
+		
+		if(player.getCash() <= 0) {
+			//player can't bet insurance so call insuranceSituation for another player or turn(p head of list)
+			if(playerNode.next == null)
+				splitSituation(firstPlayerNode);
+			else
+				insuranceSituation(playerNode.next);
+			return;
+		}
+		double maxSideBet = Math.min(player.getCash(), player.getWager()*0.5);
+		channel.sendMessageFormat("%s, how much would you like to bet insurance? ($0.00-$%.2f)", player.getUser().getAsMention(), maxSideBet).queue();
+		waiter.waitForEvent(MessageReceivedEvent.class,
+			(e) -> {
+				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser())) {
+					return false;
+				}
+				
+				try {
+					double i = Double.parseDouble(e.getMessage().getContentRaw());
+					if(i < 0) {
+						channel.sendMessage("bet must be positive").queue();
+						return false;
+					}
+					
+					if(i > player.getWager()*0.5) {
+						channel.sendMessage("you're insurance bet can only be at most 50% of your original bet (bet 0 if you don't want to bet insurance)").queue();
+						return false;
+					}
+					
+				} catch (Exception x){
+					channel.sendMessage("please enter a number").queue();
+					return false;
+				}
+				
+				return true;
+			}, (e) -> {
+				player.setSideBet(Double.parseDouble(e.getMessage().getContentRaw()));
+				
+				//only do this if playerNode.next == null (otherwise call insuranceSituation for the next player)
+				
+				if(playerNode.next == null) {
+					channel.sendMessage("dealer is checking face down card...").queue();
+					if(dealer.hasBlackjack()) { 
+						channel.sendMessage(dealer.getHand().get(1).toString()).queue();
+						channel.sendMessage("dealer has blackjack!").queue();
+						channel.sendMessage("──────────────────────────────────────").queue();
+						payout();     
+						return;
+					}
+					turn(firstPlayerNode);
+					return;
+				}
+				
+				//if playerNode.next == null and dealer has no blackjack, begin turns, otherwise, insurance bet for next player
+				insuranceSituation(playerNode.next);
+				
+				return;
+			}, 30, TimeUnit.SECONDS, () -> {
+				channel.sendMessage("you took too long betting, no side bet set");
+				
+				if(playerNode.next == null) {
+					channel.sendMessage("dealer is checking face down card...").queue();
+					if(dealer.hasBlackjack()) { 
+						channel.sendMessage(dealer.getHand().get(1).toString()).queue();
+						channel.sendMessage("dealer has blackjack!").queue();
+						channel.sendMessage("──────────────────────────────────────").queue();
+						payout();     
+						return;
+					}
+					turn(firstPlayerNode);
+					return;
+				}
+				
+				//if playerNode.next == null and dealer has no blackjack, begin turns, otherwise, insurance bet for next player
+				insuranceSituation(playerNode.next);
+		});
+	
+			
+	}
+
+	private void turn(Node pNode) {
 		//again, same deal as setBets: recursively call this function for each player
 		//	when a player stands, call turn(playerNode.next()) if the next player is not null, otherwise go to the next method
 		//channel.getGuild().retrieveMemberById(p.getUser().getId()).queue();
+		Player p = pNode.getPlayer();
 		
 		String effName = p.isSplitHand() ? String.format("%s's split hand", channel.getGuild().getMember(p.getUser()).getEffectiveName()) : channel.getGuild().getMember(p.getUser()).getEffectiveName();
 		
@@ -271,10 +397,10 @@ public class Game {
 			channel.sendMessage(p.getUser().getAsMention() + " has blackjack!").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
 			
-			if(p.isSplitHand()) {
-				turn(p.getSplitHand(), false);
+			if(pNode.next == null) {
+				dealerTurn();
 			} else {
-				dealerTurn(p);
+				turn(pNode.next);
 			}
 			
 			return;
@@ -291,34 +417,35 @@ public class Game {
 			.queue( m -> 
 				waiter.waitForEvent(ButtonInteractionEvent.class, 
 					(e) -> {
-						return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == m.getIdLong();
+						return e.getUser().equals(p.getUser()) && e.getMessageIdLong() == m.getIdLong();
 					},
 					(e) -> {
-						play(p, e, split);
+						play(pNode, e);
 						
 						//call next method or call this method again (for a different player)
 						
 					}, 30, TimeUnit.SECONDS, () -> {
-						channel.sendMessage("due to inactivity, " + player.getUser().getAsMention() + " stands").queue();
+						channel.sendMessage("due to inactivity, " + p.getUser().getAsMention() + " stands").queue();
 						//send to next method (dealer turn, player turn, or player's split hand turn)
-						dealerTurn(p);
+						dealerTurn();
 					}));
 			
 	}
 	
 	
-	private void play(Player player, ButtonInteractionEvent event, boolean split) {
+	private void play(Node playerNode, ButtonInteractionEvent event) {
+		Player player = playerNode.getPlayer();
+		
 		//recursively call play until the player busts or stands
 		if(event.getComponentId().equals("blackjack:standbutton")) {
 			event.editComponents().queue();
 			channel.sendMessage(player.getUser().getAsMention() + " stands").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
 			
-			if(split) {
-				turn(player.getSplitHand(), false);
+			if(playerNode.next == null) {
+				dealerTurn();
 			} else {
-				//or next player
-				dealerTurn(player);
+				turn(playerNode.next);
 			}
 			
 			return;
@@ -342,11 +469,10 @@ public class Game {
 			
 			channel.sendMessage("──────────────────────────────────────").queue();
 			
-			if(split) {
-				turn(player.getSplitHand(), false);
+			if(playerNode.next == null) {
+				dealerTurn();
 			} else {
-				//or next player
-				dealerTurn(player);
+				turn(playerNode.next);
 			}
 			
 			return;
@@ -364,11 +490,10 @@ public class Game {
 				channel.sendMessage(player.getUser().getAsMention() + " has a 7 card charlie!").queue();
 				channel.sendMessage("──────────────────────────────────────").queue();
 				
-				if(split) {
-					turn(player.getSplitHand(), false);
+				if(playerNode.next == null) {
+					dealerTurn();
 				} else {
-					//or next player
-					dealerTurn(player);
+					turn(playerNode.next);
 				}
 				
 				return;
@@ -381,11 +506,10 @@ public class Game {
 				//	call turn(p) for that player, otherwise it is the dealer's turn
 				channel.sendMessage("──────────────────────────────────────").queue();
 				
-				if(split) {
-					turn(player.getSplitHand(), false);
+				if(playerNode.next == null) {
+					dealerTurn();
 				} else {
-					//or next player
-					dealerTurn(player);
+					turn(playerNode.next);
 				}
 				
 				return;
@@ -398,11 +522,10 @@ public class Game {
 				//	call turn(p) for that player, otherwise it is the dealer's turn
 				channel.sendMessage("──────────────────────────────────────").queue();
 				
-				if(split) {
-					turn(player.getSplitHand(), false);
+				if(playerNode.next == null) {
+					dealerTurn();
 				} else {
-					//or next player
-					dealerTurn(player);
+					turn(playerNode.next);
 				}
 				
 				return;
@@ -417,15 +540,14 @@ public class Game {
 					return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == event.getMessageIdLong();
 				}, 
 				e -> { 
-					play(player, e, split);
+					play(playerNode, e);
 				}, 30, TimeUnit.SECONDS, () -> { 
 					channel.sendMessage("due to inactivity, " + player.getUser().getAsMention() + " stands").queue();
 					//send to next method
-					if(split) {
-						turn(player.getSplitHand(), false);
+					if(playerNode.next == null) {
+						dealerTurn();
 					} else {
-						//or next player
-						dealerTurn(player);
+						turn(playerNode.next);
 					}
 					return;
 				});
@@ -433,7 +555,7 @@ public class Game {
 		}
 	}
 	
-	private void dealerTurn(Player player) {
+	private void dealerTurn() {
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("dealer's turn")
 				.addField("current hand", dealer.getHand().toString(), false)
@@ -462,15 +584,20 @@ public class Game {
 		}
 		
 		channel.sendMessage("──────────────────────────────────────").queue();
-		payout(player);
+		payout();
 	}
 	
-	private void payout(Player player) {
+	private void payout() {
+		clearSplits();
+		
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("payout")
 				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) {
+			Player player = ptr.getPlayer();
+			eb.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), evaluatePay(player), false);
+		}
 		
-		eb.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), evaluatePay(player), false);
 		channel.sendMessageEmbeds(eb.build()).queue();
 		
 		endGame();
@@ -521,7 +648,7 @@ public class Game {
 		
 		if(p.getSplitHand() != null) {
 			p.getSplitHand().addCash(-p.getSplitHand().getCash());
-			result += evaluatePay(p.getSplitHand());
+			result += "\n" + evaluatePay(p.getSplitHand());
 			p.addCash(p.getSplitHand().getCash());
 		}
 		
@@ -536,92 +663,35 @@ public class Game {
 		return result;
 	}
 	
-	private void insuranceSituation(Player player) {
-		
-		if(player.getCash() < player.getWager()*0.5) {
-			//player can't bet insurance so call insuranceSituation for another player or turn(p head of list)
-			turn(player, false);
-			return;
+	private void clearSplits() {
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) { 
+			//should be fine because the firstPlayerNode should never be a split hand
+			if(ptr.getPlayer().isSplitHand()) {
+				ptr.prev.next = ptr.next;
+			}
 		}
-		
-		channel.sendMessageFormat("%s, how much would you like to bet insurance? ($0.00-$%.2f)", player.getUser().getAsMention(), player.getWager()*0.5).queue();
-		waiter.waitForEvent(MessageReceivedEvent.class,
-			(e) -> {
-				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser())) {
-					return false;
-				}
-				
-				try {
-					double i = Double.parseDouble(e.getMessage().getContentRaw());
-					if(i < 0) {
-						channel.sendMessage("bet must be positive").queue();
-						return false;
-					}
-					
-					if(i > player.getWager()*0.5) {
-						channel.sendMessage("you're insurance bet can only be at most 50% of your original bet (bet 0 if you don't want to bet insurance)").queue();
-						return false;
-					}
-					
-				} catch (Exception x){
-					channel.sendMessage("please enter a number").queue();
-					return false;
-				}
-				
-				return true;
-			}, (e) -> {
-				player.setSideBet(Double.parseDouble(e.getMessage().getContentRaw()));
-				
-				//only do this if playerNode.next == null (otherwise call insuranceSituation for the next player)
-				channel.sendMessage("dealer is checking face down card...").queue();
-				if(dealer.hasBlackjack()) { 
-					channel.sendMessage(dealer.getHand().get(1).toString()).queue();
-					channel.sendMessage("dealer has blackjack!").queue();
-					channel.sendMessage("──────────────────────────────────────").queue();
-					payout(player);     
-					return;
-				}
-				
-				//if playerNode.next == null and dealer has no blackjack, begin turns 
-				turn(player, false);
-				return;
-			}, 30, TimeUnit.SECONDS, () -> {
-				channel.sendMessage("you took too long betting, no side bet set");
-				
-				//only do this if playerNode.next == null (otherwise call insuranceSituation for the next player)
-				channel.sendMessage("dealer is checking face down card...").queue();
-				if(dealer.hasBlackjack()) { 
-					channel.sendMessage(dealer.getHand().get(1).toString()).queue();
-					channel.sendMessage("dealer has blackjack!").queue();
-					channel.sendMessage("──────────────────────────────────────").queue();
-					payout(player);     
-					return;
-				}
-				
-				//if playerNode.next == null and dealer has no blackjack, begin turns 
-				turn(player, false);
-				return;
-		});
-
-			
 	}
-	
+
 	private void endGame() {
 		EmbedBuilder eb = new EmbedBuilder();
 		
-		if(player.getCash() <= 0.001) {
-			channel.sendMessage("you have no money left, ending game...").queue();
+//		outdated, instead remove players who have zero cash (you can do this later or add a separate method in the linkedlist class
+		boolean allPlayersBroke = clearBrokePlayers();
+		
+		if(allPlayersBroke) {
+			channel.sendMessage("all players have ran out of money, ending game").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
 			stop();
 			return;
 		}
-			eb.setTitle("round has ended")
-				.setDescription("do you wish to continue?")
-				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
+		
+		eb.setTitle("round has ended")
+			.setDescription("do you wish to continue?")
+			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 				
 		channel.sendMessageEmbeds(eb.build()).setActionRow(Button.success("blackjack:continuebutton", "continue"), Button.danger("blackjack:end_game_button", "end game")).queue(msg ->
 		waiter.waitForEvent(ButtonInteractionEvent.class, e -> {
-			return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == msg.getIdLong();
+			return e.getUser().equals(firstPlayerNode.getPlayer().getUser()) && e.getMessageIdLong() == msg.getIdLong();
 		},
 		e -> {
 			if(e.getComponentId().equals("blackjack:continuebutton")) {
@@ -647,6 +717,34 @@ public class Game {
 		}));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean clearBrokePlayers() {
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) {
+			if(ptr.getPlayer().getCash() <= 0.001) {
+				channel.sendMessage(ptr.getPlayer().getUser().getAsMention() +  " has lost all their money, removing them from the game").queue();
+				
+				if(ptr == firstPlayerNode) {
+					if(firstPlayerNode.next == null) {
+						return true;
+					}
+					
+					firstPlayerNode = firstPlayerNode.next;
+					break;
+				}
+				
+				if(ptr.next != null)
+					ptr.next.prev = ptr.prev;
+					
+				ptr.prev.next = ptr.next;
+			}
+		}
+		
+		return false;
+	}
+	
 	public void stop() {
 		started = false;
 		BlackjackManager.getInstance().getGameManager(channel.getGuild()).started = false;
@@ -657,10 +755,16 @@ public class Game {
 				.setFooter("by mute | https://github.com/mvte")
 				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
-		//loop for multiple players
-		eb.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), String.format("$%.2f", player.getCash()), false);
-			//should also save to database here (if you do add it)
 		
+		
+		//loop for multiple players
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) {
+			Player player = ptr.getPlayer();
+			eb.addField(channel.getGuild().getMember(player.getUser()).getEffectiveName(), String.format("$%.2f", player.getCash()), false);
+			//should also save to database here (if you do add it)
+		}
+			
+		this.players = new LinkedList();
 		channel.sendMessageEmbeds(eb.build()).queue();
 	}
 	

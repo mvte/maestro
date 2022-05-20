@@ -220,13 +220,10 @@ public class Game {
 				insuranceSituation(firstPlayerNode);
 				return;
 			}
-			
-			splitSituation(firstPlayerNode);
-			return;
 		}
 		
 		//if dealer has blackjack, than none of the players should be allowed to play
-		if(dealer.getHand().get(0).getValue() == 10) {
+		if(dealer.getHand().get(0).getValue() == 10 || dealer.getHand().get(0).getValue() == 1) {
 			channel.sendMessage("dealer is checking face down card...").queue();
 		}
 		

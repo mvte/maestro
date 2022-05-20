@@ -15,7 +15,7 @@ public class JoinButton implements Interaction {
 		event.deferEdit().queue();
 		
 		if(manager.started) { 
-			channel.sendMessage("you cannot join a game that has already started").queue();
+			event.getHook().sendMessage("you cannot join a game that has already started").setEphemeral(true).queue();
 			return;
 		}
 		
@@ -23,7 +23,7 @@ public class JoinButton implements Interaction {
 		
 		for(Player p : manager.getPlayers()) {
 			if(p.getUser().equals(event.getUser())) {
-				channel.sendMessage("this player has already joined the game").queue();
+				event.getHook().sendMessage("you have already joined the game").setEphemeral(true).queue();
 				return;
 			}
 		}

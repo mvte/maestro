@@ -26,6 +26,7 @@ public class Start implements Interaction {
 		.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
 		GuildGameManager gameManager = BlackjackManager.getInstance().getGameManager(event.getGuild());
+		gameManager.nullGame();
 		gameManager.addPlayer(new Player(1000, event.getAuthor()));
 		
 		channel.sendMessageEmbeds(embed.build()).setActionRow(Button.success("blackjack:startbutton", "start"), Button.danger("blackjack:cancelbutton", "cancel"), Button.secondary("blackjack:join_button", "join")).queue();

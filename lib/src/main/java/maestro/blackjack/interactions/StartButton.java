@@ -22,7 +22,8 @@ public class StartButton implements Interaction {
 		}
 		
 		if(!gameManager.getPlayers().get(0).getUser().equals(event.getUser())) {
-			channel.sendMessage("you don't have permission to start this game").queue();
+			event.deferEdit().queue();
+			event.getHook().sendMessage("you don't have permission to start this game").setEphemeral(true).queue();
 			return;
 		}
 		

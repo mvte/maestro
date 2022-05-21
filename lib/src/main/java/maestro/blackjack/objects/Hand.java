@@ -5,17 +5,25 @@ import java.util.ArrayList;
 public class Hand {
 	private ArrayList<Card> cards;
 	
-	//default constructor
+	/**
+	 * Constructs an empty hand
+	 */
 	public Hand() {
 		cards = new ArrayList<>();
 	}
 	
-	//adds a card to the hand
+	/**
+	 * Adds a card to the hand.
+	 * @param c The card to be added
+	 */
 	public void add(Card c) {
 		cards.add(c);
 	}
 	
-	//returns the value of the hand
+	/**
+	 * Adds up the values of all the cards in the hand. If there is an ace, it can be worth 1 or 11, depending on which is most advantageous.
+	 * @return the value of the hand
+	 */
 	public int value() {
 		boolean hasAce = false;
 		int sum = 0;
@@ -32,23 +40,36 @@ public class Hand {
 		return sum;
 	}
 	
-	//returns the card at index i
+	/**
+	 * Gets the card at index i
+	 * @param i the index
+	 * @return the card at index i
+	 */
 	public Card get(int i) {
 		return cards.get(i);
 	}
 	
-	//returns the number of cards in the hand
+	/**
+	 * Gets the number of cards in the hand
+	 * @return the number of cards in the hand
+	 */
 	public int size() {
 		return cards.size();
 	}
 	
-	//removes a card from the hand and returns it (solely for the purpose of split hands)
+	/**
+	 * Removes a card from the hand and returns it (solely for the purpose of split hands)
+	 * @param i the index of the card being removed
+	 * @return the card being removed
+	 */
 	public Card remove(int i) {
 		return cards.remove(i);
 	}
 	
-	//displays all cards in the hand
+	@Override
 	public String toString() {
+		//e.g. | CARD 1 | CARD 2 | CARD 3 |
+		
 		String result = "\\| ";
 		for(Card c: cards) {
 			result += c + " \\| ";
@@ -56,7 +77,10 @@ public class Hand {
 		return result;
 	}
 	
-	//a hand is soft if the hand has an ace who's value is 10 (as opposed to 1)
+	/**
+	 * A hand is soft if the hand has an ace who's value is 10 (as opposed to 1)
+	 * @return whether or not the hand is soft
+	 */
 	public boolean getSoft() {
 		int sum = 0;
 		boolean hasAce = false;

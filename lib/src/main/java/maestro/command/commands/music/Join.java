@@ -30,6 +30,7 @@ public class Join implements CommandInterface {
 		
 		if(!self.hasPermission(Permission.VOICE_CONNECT)) {
 			channel.sendMessage("i don't have permission to connect to a voice channel");
+			return;
 		}
 		
 		if(selfVoiceState.inAudioChannel()) {

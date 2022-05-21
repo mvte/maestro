@@ -10,7 +10,10 @@ public class Card {
 		this.value = value;
 	}
 	
-	//corresponds the suit number to its actual name and returns that
+	/**
+	 * Corresponds the suit number to its actual name (should probably have been done with an enum, but oh well)
+	 * @return The suit of the card
+	 */
 	public String getSuit() {
 		switch(suit) {
 			case 1:
@@ -26,13 +29,11 @@ public class Card {
 		return null;
 	}
 	
-	/**
-	 * I've made two different getter methods for the value of the card. The first one simply returns an int, easy
-	 * for calculating value of hand. The other method is for displaying the card and for detecting an ace or a
-	 * split hand.
-	 */
 	
-	//returns value
+	/**
+	 * Gets the numerical value of the card. For blackjack purposes, all cards whose rank is above 10 becomes evaluated as 10
+	 * @return the numerical value of the card
+	 */
 	public int getValue() {
 		if(value >= 10)
 			return 10;
@@ -40,12 +41,19 @@ public class Card {
 			return value;
 	}
 	
-	//returns true if the card's face (not value) is equal to @param c's
+	/**
+	 * Not a proper test of equality, as it only compares the card's rank (and not suit)
+	 * @param c The card being compared
+	 * @return true if this card's rank (not value) is equal to c's
+	 */
 	public boolean equals(Card c) {
 		return this.getValueString().equals(c.getValueString());
 	}
 	
-	//returns value but with true naming
+	/**
+	 * Gets the rank of the card 
+	 * @return the rank of the card
+	 */
 	public String getValueString() {
 		if(value == 1)
 			return "ACE";
@@ -59,8 +67,9 @@ public class Card {
 			return value+"";
 	}
 	
-	//e.g. ACE of SPADES
+	@Override
 	public String toString() {
+		//e.g. ACE of SPADES
 		return "*" + getValueString() + " of " +  getSuit() + "*";
 	}
 

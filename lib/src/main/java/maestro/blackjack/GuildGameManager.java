@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 
 /**
  * Takes the commands from the BlackjackManager and manages the game accordingly
@@ -17,10 +16,18 @@ public class GuildGameManager {
 	public boolean started = false;
 	private ArrayList<Player> players;
 	
+	/**
+	 * Constructs an empty GuildGameManager
+	 */
 	public GuildGameManager() {
 		players = new ArrayList<>();
 	}
 	
+	
+	/**
+	 * Begins a game of blackjack.
+	 * @param channel The channel in which to send the game messages to
+	 */
 	public void beginGame(TextChannel channel) {
 		
 		this.channel = channel;
@@ -29,11 +36,15 @@ public class GuildGameManager {
 		this.started = game.started;
 		
 		
-		game.run(true);
+		game.run();
 	}
 	
+	/**
+	 * Stops the game of blackjack in a channel, if there is one (might remove this as eventwaiter is messing up how it works).
+	 * @param channel
+	 */
 	public void stop(TextChannel channel) {
-		//other stuff to ensure game ends properly (like saving all data to db)
+		//add other stuff to ensure game ends properly (like saving all data to db)
 		//should check permissions
 		
 		EmbedBuilder eb = new EmbedBuilder();
@@ -52,17 +63,24 @@ public class GuildGameManager {
 		this.channel.sendMessageEmbeds(eb.build()).queue();
 	}
 	
+	/**
+	 * Adds a player to the ArrayList of players
+	 * @param player The player that is being added
+	 */
 	public void addPlayer(Player player) {
 		players.add(player);
 	}
 	
+	/**
+	 * Gets the ArrayList of players
+	 * @return the ArrayList of Players
+	 */
 	public ArrayList<Player> getPlayers() {
 		return players;
 	}
 	
 	/**
-	 * nullifies the game instance to ensure a proper game end
-	 * i also have to empty this list 
+	 * Nullifies the game instance to ensure a proper game end. But to achieve the behavior we want, we also have to remove all the Players in this manager's ArrayList of Players
 	 */
 	public void nullGame() {
 		players.removeAll(players);

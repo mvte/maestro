@@ -26,7 +26,10 @@ public class BlackjackManager {
 	private final Map<Long, GuildGameManager> gameManagers;
 	private final List<Interaction> interactions;
 
-	public BlackjackManager() {
+	/**
+	 * Constructs the BlackjackManager instance (and registers all Interactions). There can only be one BlackjackManager Instance for every instance of the Bot.
+	 */
+	private BlackjackManager() {
 		this.gameManagers = new HashMap<>();
 		interactions = new ArrayList<>();
 		
@@ -39,6 +42,11 @@ public class BlackjackManager {
 		addInteraction(new JoinButton());
 	}
 	
+	/**
+	 * Returns the GuildGameManager for a given guild. If a GuildGameManager for a guild doesn't exist, it will create one
+	 * @param guild The guild whose GuildGameManager we are trying to get
+	 * @return The GuildGameManager for the given guild
+	 */
 	public GuildGameManager getGameManager(Guild guild) {
 		return this.gameManagers.computeIfAbsent(guild.getIdLong(), (guildId) -> {
 			final GuildGameManager guildGameManager = new GuildGameManager();
@@ -46,7 +54,11 @@ public class BlackjackManager {
 		});
 	}
 	
-	public void addInteraction(Interaction intr) {
+	/**
+	 * Adds an Interaction Object to the registered list of interactions
+	 * @param intr The Interaction Object we are adding to the manager
+	 */
+	private void addInteraction(Interaction intr) {
 		boolean exists = this.interactions.stream().anyMatch((it) -> it.getId().equalsIgnoreCase(intr.getId()));
 
 		if (exists)
@@ -56,6 +68,11 @@ public class BlackjackManager {
 		
 	}
 	
+	/**
+	 * Gets the Interactoin whose getId() method returns the given ID
+	 * @param id ID of the interaction we are trying to get
+	 * @return the Interaction if it exists (null if it doesn't)
+	 */
 	public Interaction getInteraction(String id) {
 		id = id.toLowerCase();
 
@@ -89,7 +106,6 @@ public class BlackjackManager {
 	/**
 	 * Handles a blackjack button press. 
 	 * @param event The button press event
-	 * 		this could be merged with the handleCommand method using an if(x instanceof y)
 	 */
 	public void handleButtonPress(ButtonInteractionEvent event) {
 		String invoke = event.getComponentId();
@@ -100,6 +116,10 @@ public class BlackjackManager {
 		
 	}
 	
+	/**
+	 * Gets the instance of the BlackjackManager, if the instance doesn't exist create it. There can only be one BlackjackManager instance
+	 * @return
+	 */
 	public static BlackjackManager getInstance() {
 		if(INSTANCE == null) {
 			INSTANCE = new BlackjackManager();

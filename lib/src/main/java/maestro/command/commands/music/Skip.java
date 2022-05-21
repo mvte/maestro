@@ -29,10 +29,12 @@ public class Skip implements CommandInterface {
 		
 		if(!memberVS.inAudioChannel()) {
 			channel.sendMessage("you need to be in a voice channel").queue();
+			return;
 		}
 		
 		if(!memberVS.getChannel().equals(selfVS.getChannel())) {
 			channel.sendMessage("you need to be in the same voice channel as me").queue();
+			return;
 		}
 		
 		final GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());

@@ -8,7 +8,10 @@ public class Deck {
 	private int numDecks = 1;
 	
 	 
-	//Constructs a deck of 52 cards, and will shuffle depending on the parameters.
+	/**
+	 * Constructs a standard 52 card deck
+	 * @param shuffle Whether or not to shuffle the deck
+	 */
 	public Deck(boolean shuffle) {
 		cards = new ArrayList<Card>();
 		
@@ -21,7 +24,11 @@ public class Deck {
 			shuffle();
 	}
 	
-	// Constructs a deck of multiple standard size decks
+	/**
+	 * Constructs a deck of multiple standard size decks
+	 * @param shuffle Whether or not to shuffle the deck
+	 * @param numDecks The number of decks to create
+	 */
 	public Deck(boolean shuffle, int numDecks) {
 		cards = new ArrayList<Card>();
 		this.numDecks = numDecks;
@@ -36,22 +43,30 @@ public class Deck {
 			shuffle();
 	}
 	
-	//returns the deck
+	/**
+	 * @return the deck of cards
+	 */
 	public ArrayList<Card> getDeck() {
 		return cards;
 	}
 	
-	//shuffles the deck
+	/**
+	 * Shuffles the deck
+	 */
 	public void shuffle() {
 		Collections.shuffle(cards);
 	}
 	
-	//returns true if there are no cards in the deck
+	/**
+	 * Checks if the deck is empty
+	 * @return true if the deck is empty (0 cards)
+	 */
 	public boolean isEmpty() {
 		return cards.size() == 0;
 	}
 	
-	/** Deals a card and removes it from the deck.
+	/** 
+	 * Deals a card and removes it from the deck.
 	 * If the deck is empty, then a new deck will be created.
 	 * @return Card the dealt card
 	 */

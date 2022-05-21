@@ -42,7 +42,7 @@ public class CommandManager {
 		addCommand(new Help(this));
 		addCommand(new Hello());
 		addCommand(new Micaela());
-		addCommand(new Blackjack());	//any command that may use a waiter should take it as a parameter 
+		addCommand(new Blackjack());
 		addCommand(new Snipe());
 		addCommand(new Join());
 		addCommand(new Leave());

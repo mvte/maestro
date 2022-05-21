@@ -56,4 +56,17 @@ public class Hand {
 		return result;
 	}
 	
+	//a hand is soft if the hand has an ace who's value is 10 (as opposed to 1)
+	public boolean getSoft() {
+		int sum = 0;
+		boolean hasAce = false;
+		for(Card c : cards) {
+			sum += c.getValue();
+			if(!hasAce)
+				hasAce = c.getValueString().equals("ACE");
+		}
+		
+		return sum<=11 && hasAce;
+	}
+	
 }

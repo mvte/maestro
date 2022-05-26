@@ -1,0 +1,1 @@
+worker: java src/main/java/maestro/Bot.java

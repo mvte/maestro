@@ -1,1 +1,1 @@
-worker: java src/main/java/maestro/Bot.java
+worker: java lib/src/main/java/maestro/Bot.java

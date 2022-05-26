@@ -31,3 +31,11 @@ dependencies {
 }
 
 compileJava.options.encoding = "UTF-8"
+
+task stage(dependsOn: ['build', 'shadowJar', 'clean'])
+build.mustRunAfter clean
+
+jar
+
+
+		

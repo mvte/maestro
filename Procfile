@@ -1,1 +1,1 @@
-worker: java lib/src/main/java/maestro/Bot.java
+worker: java -jar lib\build\libs\lib-1.1.1-all.jar

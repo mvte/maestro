@@ -1,10 +1,8 @@
 package maestro.command.commands.music;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
-import maestro.Bot;
 import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
@@ -43,7 +41,7 @@ public class Play implements CommandInterface {
 		String link = String.join(" ", args);
 		
 		if(!isURL(link)) {
-			link = "ytsearch:" + link;
+			link = "ytsearch:" + link + " ";	
 		}
 		
 		// Create PlayerManager and use it to load the song. 
@@ -68,9 +66,9 @@ public class Play implements CommandInterface {
 	 */
 	private boolean isURL(String url) {
 		try {
-			new URI(url);
+			new URL(url).toURI();
 			return true;	
-		} catch (URISyntaxException e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}

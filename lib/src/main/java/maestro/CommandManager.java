@@ -10,12 +10,14 @@ import javax.annotation.Nullable;
 import maestro.command.CommandInterface;
 import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
+import maestro.command.commands.Bugs;
 import maestro.command.commands.Hello;
 import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
 import maestro.command.commands.Ping;
 import maestro.command.commands.Snipe;
 import maestro.command.commands.math.ApproximatePi;
+import maestro.command.commands.math.CountPrimes;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
@@ -56,6 +58,8 @@ public class CommandManager {
 		addCommand(new Pause());
 		addCommand(new SetPrefix());
 		addCommand(new ApproximatePi());
+		addCommand(new Bugs());
+		addCommand(new CountPrimes());
 	}
 
 	private void addCommand(CommandInterface cmd) {

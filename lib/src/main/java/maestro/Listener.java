@@ -2,6 +2,8 @@ package maestro;
 
 import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
+import maestro.lavaplayer.GuildMusicManager;
+import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -51,6 +53,8 @@ public class Listener extends ListenerAdapter{
 		}
 		
 		if(self.getVoiceState().getChannel().getMembers().size() == 1 && self.getVoiceState().getChannel().getMembers().get(0).equals(self)) {
+			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+			musicManager.audioPlayer.destroy();
 			event.getGuild().getAudioManager().closeAudioConnection();
 		}
 		

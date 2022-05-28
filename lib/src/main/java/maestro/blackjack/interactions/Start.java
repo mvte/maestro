@@ -21,7 +21,7 @@ public class Start implements Interaction {
 		
 		embed.setTitle("| starting a game of blackjack |")
 		.setDescription("wait for others to join using the join button or play a game by yourself. press start when you're ready, or cancel to cancel.")
-		.addField("settings", "starting cash: `1000`\nnumber of decks: `6`", false)
+		.addField("settings", "starting cash: `1000`\nnumber of decks: `6`\ndealer hits on soft 17", false)
 		.setFooter("by mute | https://github.com/mvte")
 		.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		

@@ -3,6 +3,8 @@ package maestro.command.commands.music;
 import java.util.List;
 
 import maestro.command.CommandInterface;
+import maestro.lavaplayer.GuildMusicManager;
+import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -34,8 +36,10 @@ public class Leave implements CommandInterface {
 		
 		final AudioManager audioManager = guild.getAudioManager();
 		final AudioChannel selfChannel = selfVoiceState.getChannel();
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 		
 		audioManager.closeAudioConnection();
+		musicManager.audioPlayer.destroy();
 		channel.sendMessage("leaving :loud_sound: **" + selfChannel.getName() + "**").queue();
 		
 	}

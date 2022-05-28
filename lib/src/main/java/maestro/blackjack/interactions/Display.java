@@ -21,7 +21,7 @@ public class Display implements Interaction {
 		.setDescription("welcome to blackjack! use `" + prefix + "blackjack start` to begin")
 		.addField("description" ,"your hand must beat the dealer's hand without going over 21. you and the dealer will both be dealt two cards, after which you will be dealt one card at a time until you \"stand\". " + 
 				"the dealer will deal himself cards until they wish to stop. whoever's hand has the highest value wins.", false)
-		.addField("rules", "use google", false)
+		.addField("rules", "use `" + prefix + "blackjack rules`", false)
 		.addField("commands", "`start` begins a game of blackjack\n" /*+ 
 				"`stop` stops an ongoing game of blackjack (you must have admin privileges). if you created a game and you wish to stop it, you must do so after a round is finished\n"*/, false)
 		.setFooter("by mute | https://github.com/mvte")

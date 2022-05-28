@@ -91,6 +91,8 @@ public class PlayerManager {
 					musicManager.scheduler.queue(track);
 				}
 				
+				
+				channel.sendMessage(":notes: now playing :notes:\n`" + tracks.get(0).getInfo().title + "` by `" + tracks.get(0).getInfo().author + "`").queue();
 			}
 
 			@Override
@@ -101,7 +103,7 @@ public class PlayerManager {
 
 			@Override
 			public void loadFailed(FriendlyException exception) {
-				channel.sendMessage("uh oh, something went wrong D:\n" + exception.getMessage().toLowerCase()).queue();
+				System.out.println("uh oh, something went wrong D:\n" + exception.getMessage().toLowerCase());
 				exception.printStackTrace();
 				
 			}

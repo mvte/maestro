@@ -11,7 +11,9 @@ import maestro.blackjack.objects.Card;
 import maestro.blackjack.objects.Deck;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -696,11 +698,14 @@ public class Game {
 			.setDescription("do you wish to continue?")
 			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 				
-		channel.sendMessageEmbeds(eb.build()).setActionRow(Button.success("blackjack:continuebutton", "continue"), Button.danger("blackjack:end_game_button", "end game")).queue(msg ->
+		channel.sendMessageEmbeds(eb.build()).setActionRow(Button.success("blackjack:continuebutton", "continue"), Button.danger("blackjack:end_game_button", "end game"), Button.secondary("blackjack:leave_game_button", "leave game")).queue(msg ->
 		waiter.waitForEvent(ButtonInteractionEvent.class, e -> {
-			return e.getUser().equals(firstPlayerNode.getPlayer().getUser()) && e.getMessageIdLong() == msg.getIdLong();
+			return  !e.getComponentId().equals("blackjack:leave_game_button") 
+						&& e.getMessageIdLong() == msg.getIdLong()
+						&& (e.getUser().equals(firstPlayerNode.getPlayer().getUser()) || channel.getGuild().getMember(e.getUser()).hasPermission(Permission.MANAGE_SERVER));
 		},
 		e -> {
+
 			if(e.getComponentId().equals("blackjack:continuebutton")) {
 				e.editComponents().queue();
 				channel.sendMessage("continuing game").queue();
@@ -715,8 +720,11 @@ public class Game {
 				stop();
 				return;
 			}
-			
+
 		}, 90, TimeUnit.SECONDS, () -> {
+			if(firstPlayerNode == null)
+				return;
+			
 			channel.sendMessage("received no response, stopping game").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
 			stop();
@@ -746,7 +754,7 @@ public class Game {
 				
 				if(ptr.next != null)
 					ptr.next.prev = ptr.prev;
-					
+	
 				ptr.prev.next = ptr.next;
 			} else {
 				allPlayersBroke = false;
@@ -754,6 +762,37 @@ public class Game {
 		}
 		
 		return allPlayersBroke;
+	}
+	
+	public void removePlayer(User user, ButtonInteractionEvent event) {
+		for(Node ptr = firstPlayerNode; ptr != null; ptr = ptr.next) { 
+			if(ptr.getPlayer().getUser().getIdLong() == user.getIdLong()) {
+				String str = String.format("%s has left the game with $%.2f", ptr.getPlayer().getUser().getAsMention(), ptr.getPlayer().getCash());
+				channel.sendMessage(str).queue();
+				
+				if(ptr == firstPlayerNode) {
+					if(firstPlayerNode.next == null) {
+						event.editComponents().queue();
+						channel.sendMessage("all players have left the game, ending game").queue();
+						channel.sendMessage("──────────────────────────────────────").queue();
+						stop();
+						return;
+					}
+					
+					event.deferEdit().queue();
+					firstPlayerNode = firstPlayerNode.next;
+					return;
+				}
+				
+				event.deferEdit().queue();
+				if(ptr.next != null)
+					ptr.next.prev = ptr.prev;
+				ptr.prev.next = ptr.next;
+				return;
+			}
+		}
+		
+		event.reply("you aren't playing in this game").setEphemeral(true).queue();
 	}
 
 	/**
@@ -777,7 +816,7 @@ public class Game {
 			
 		channel.sendMessageEmbeds(eb.build()).queue();
 		
-		this.players = new LinkedList();
+		this.players = null;
 		firstPlayerNode = null;
 		BlackjackManager.getInstance().getGameManager(channel.getGuild()).nullGame();
 	}

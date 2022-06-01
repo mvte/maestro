@@ -40,7 +40,9 @@ public class Leave implements CommandInterface {
 		
 		audioManager.closeAudioConnection();
 		musicManager.audioPlayer.destroy();
+		PlayerManager.getInstance().getMusicManager(guild).scheduler.future.cancel(false);
 		channel.sendMessage("leaving :loud_sound: **" + selfChannel.getName() + "**").queue();
+		
 		
 	}
 

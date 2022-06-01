@@ -54,6 +54,12 @@ public class Remove implements CommandInterface {
 		
 		String nStr = args.get(0);
 		
+		if(nStr.equals("all")) {
+			manager.scheduler.queue.removeAll(manager.scheduler.queue);
+			channel.sendMessage("removed all songs from the queue").queue();
+			return;
+		}
+		
 		int n;
 		try {
 			n = Integer.parseInt(nStr);
@@ -94,7 +100,7 @@ public class Remove implements CommandInterface {
 	
 	@Override
 	public String getHelp(String prefix) {
-		return "removes the *nth* track in the queue\n " + prefix + "remove `[n]`";
+		return "removes the *nth* track in the queue\n" + prefix + "remove `<n>`\nyou can also use " + prefix + "remove `all` to clear the queue";
 	}
 
 }

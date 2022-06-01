@@ -58,7 +58,6 @@ public class PlayerManager {
 	 */
 	public void loadAndPlay(TextChannel channel, String trackURL) {
 		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
-		musicManager.scheduler.setChannel(channel);
 		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
 			//defining an AudioLoadResultHandler
 			@Override
@@ -91,8 +90,8 @@ public class PlayerManager {
 					musicManager.scheduler.queue(track);
 				}
 				
-				
-				channel.sendMessage(":notes: now playing :notes:\n`" + tracks.get(0).getInfo().title + "` by `" + tracks.get(0).getInfo().author + "`").queue();
+				if(musicManager.audioPlayer.getPlayingTrack().equals(tracks.get(0)))
+					channel.sendMessage(":notes: now playing :notes:\n`" + tracks.get(0).getInfo().title + "` by `" + tracks.get(0).getInfo().author + "`").queue();
 			}
 
 			@Override

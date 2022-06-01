@@ -2,6 +2,7 @@ package maestro.lavaplayer;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -9,16 +10,22 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 
 public class TrackScheduler extends AudioEventAdapter {
 	
 	public final AudioPlayer player;
 	public final BlockingQueue<AudioTrack> queue;
+	
 	private TextChannel channel;
 	public boolean repeating = false;
 	private int errorCount = 0;
+	public double endTime = -1;		//special value (for if the bot joins and hasn't started playing anything)
+	public ScheduledFuture<?> future;
+	public final Inactivity inactivity = new Inactivity();
 	
 	
 	public TrackScheduler(AudioPlayer player) {
@@ -28,6 +35,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 	
 	public void queue(AudioTrack track) {
+		endTime = 0;
 		// If the track was started, there's no point in adding it to the queue.
 		if(!this.player.startTrack(track, true)) {
 			this.queue.offer(track);
@@ -44,6 +52,8 @@ public class TrackScheduler extends AudioEventAdapter {
 		if(endReason == AudioTrackEndReason.FINISHED) {
 			errorCount = 0;
 		}
+		
+		endTime = System.currentTimeMillis();
 		
 		if(endReason.mayStartNext) {
 			if(repeating) {
@@ -74,4 +84,30 @@ public class TrackScheduler extends AudioEventAdapter {
 	public void setChannel(TextChannel channel) {
 		this.channel = channel;
 	}
+	
+	
+	private class Inactivity implements Runnable {
+
+		@Override
+		/**
+		 * Disconnects the bot from a server if they haven't been playing anything for more than 4.833 minutes. 
+		 */
+		public void run() {
+			final Guild guild = channel.getGuild();
+			final AudioManager audioManager = guild.getAudioManager();
+			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+			
+			boolean timeLimitPassed = (System.currentTimeMillis() - endTime) >= 290000 || endTime == -1;
+			boolean notPlaying = musicManager.audioPlayer.getPlayingTrack() == null && !musicManager.audioPlayer.isPaused();
+			
+			if(timeLimitPassed && notPlaying) {
+				audioManager.closeAudioConnection();
+				musicManager.audioPlayer.destroy();
+				channel.sendMessage("leaving due to inactivity").queue();
+				future.cancel(false);
+			}
+		}
+		
+	}
+	
 }

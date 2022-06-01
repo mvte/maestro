@@ -15,9 +15,6 @@ import maestro.command.commands.Hello;
 import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
 import maestro.command.commands.Ping;
-import maestro.command.commands.Snipe;
-import maestro.command.commands.math.ApproximatePi;
-import maestro.command.commands.math.CountPrimes;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
@@ -45,7 +42,7 @@ public class CommandManager {
 		addCommand(new Hello());
 		addCommand(new Micaela());
 		addCommand(new Blackjack());
-		addCommand(new Snipe());
+		//addCommand(new Snipe());
 		addCommand(new Join());
 		addCommand(new Leave());
 		addCommand(new Play());
@@ -57,9 +54,9 @@ public class CommandManager {
 		addCommand(new Remove());
 		addCommand(new Pause());
 		addCommand(new SetPrefix());
-		addCommand(new ApproximatePi());
+		//addCommand(new ApproximatePi());
 		addCommand(new Bugs());
-		addCommand(new CountPrimes());
+		//addCommand(new CountPrimes());
 	}
 
 	private void addCommand(CommandInterface cmd) {

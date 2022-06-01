@@ -9,10 +9,10 @@ import maestro.blackjack.interactions.CancelButton;
 import maestro.blackjack.interactions.Display;
 import maestro.blackjack.interactions.Interaction;
 import maestro.blackjack.interactions.JoinButton;
+import maestro.blackjack.interactions.Leave;
 import maestro.blackjack.interactions.Rules;
 import maestro.blackjack.interactions.Start;
 import maestro.blackjack.interactions.StartButton;
-import maestro.blackjack.interactions.Stop;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -39,9 +39,9 @@ public class BlackjackManager {
 		addInteraction(new Display());
 		addInteraction(new Start());
 		addInteraction(new CancelButton());
-		addInteraction(new Stop());
 		addInteraction(new JoinButton());
-		addInteraction(new Rules());	
+		addInteraction(new Rules());
+		addInteraction(new Leave());
 	}
 	
 	/**

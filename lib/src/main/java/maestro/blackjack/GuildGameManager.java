@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 /**
  * Takes the commands from the BlackjackManager and manages the game accordingly
@@ -85,6 +87,14 @@ public class GuildGameManager {
 	public void nullGame() {
 		players.removeAll(players);
 		game = null;
+	}
+	
+	/**
+	 * Removes a user from the game
+	 * @param user The user to be removed
+	 */
+	public void removePlayer(User user, ButtonInteractionEvent event) {
+		game.removePlayer(user, event);
 	}
 	
 

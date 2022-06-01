@@ -1,6 +1,8 @@
 package maestro;
 
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.security.auth.login.LoginException;
 
@@ -19,6 +21,7 @@ public class Bot {
 	public static JDA bot;
 	public static String prefix = Config.get("PREFIX");
 	public static EventWaiter waiter = new EventWaiter();
+	public static ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 	
 	private Bot() throws LoginException, SQLException {
 		

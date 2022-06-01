@@ -54,6 +54,7 @@ public class Listener extends ListenerAdapter{
 		
 		if(self.getVoiceState().getChannel().getMembers().size() == 1 && self.getVoiceState().getChannel().getMembers().get(0).equals(self)) {
 			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+			PlayerManager.getInstance().getMusicManager(event.getGuild()).scheduler.future.cancel(false);
 			musicManager.audioPlayer.destroy();
 			event.getGuild().getAudioManager().closeAudioConnection();
 		}

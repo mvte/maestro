@@ -31,7 +31,7 @@ public class Help implements CommandInterface{
 				.setDescription("use `" + prefix + "help [command]` for more information about a command")
 				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `setprefix`, `bugs`", false)
 				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
-				.addField("math commands", "`approxpi`, `countprimes`", false)
+				//.addField("math commands", "`approxpi`, `countprimes`", false) 	these commands can break the bot D:
 				.addField("blackjack", "21", false)
 				//.addField("sniping", "you first", false)
 				.setFooter("by mute | https://github.com/mvte")

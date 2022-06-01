@@ -16,8 +16,7 @@ public class Bugs implements CommandInterface {
 				.setTitle("submit bugs here", "https://github.com/mvte/maestro/issues")
 				.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl())
 				.setDescription("click the link above to submit any bugs you find. in addition, below is a list of currently known bugs")
-				.addField("play sometimes doesn't work", "this issue only occurs with youtube links (youtube and discord music bots are not on amicable terms). the only solution for now is to try again or use soundcloud links", false);
-					//integrating lavalink would give me the tools to fix this
+				.addField("no known bugs", "use the link above to report bugs", false);
 		
 		channel.sendMessageEmbeds(eb.build()).queue();
 	}

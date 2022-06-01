@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class JoinButton implements Interaction {
 
-	
 	public void handle(ButtonInteractionEvent event) {
 		GuildGameManager manager = BlackjackManager.getInstance().getGameManager(event.getGuild());
 		TextChannel channel = event.getTextChannel();

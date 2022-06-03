@@ -110,6 +110,49 @@ public class PlayerManager {
 		});
 	}
 	
+	public void loadAndPlaySkip(TextChannel channel, String trackURL) {
+		final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+		this.audioPlayerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
+
+			@Override
+			public void trackLoaded(AudioTrack track) {
+				if(musicManager.audioPlayer.getPlayingTrack() != null)
+					channel.sendMessage("skipping...").queue();
+				channel.sendMessage("now playing `" + track.getInfo().title + "` by `" + track.getInfo().author + "`");
+				
+				musicManager.scheduler.playSkip(track);
+			}
+
+			@Override
+			public void playlistLoaded(AudioPlaylist playlist) {
+				
+				if(playlist.isSearchResult()) {
+					trackLoaded(playlist.getTracks().get(0));
+					return;
+				}
+				
+				if(musicManager.audioPlayer.getPlayingTrack() != null)
+					channel.sendMessage("skipping...").queue();
+				channel.sendMessage("adding to front of queue `" + playlist.getTracks().size() + "` tracks from playlist `" + playlist.getName() + "`").queue();
+				
+				musicManager.scheduler.playSkip(playlist.getTracks());
+			}
+
+			@Override
+			public void noMatches() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void loadFailed(FriendlyException exception) {
+				// TODO Auto-generated method stub
+				
+			}
+
+		});
+	}
+	
 	/**
 	 * @return The global PlayerManager instance
 	 */

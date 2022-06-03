@@ -21,9 +21,11 @@ public class Remove implements CommandInterface {
 		final TextChannel channel = event.getTextChannel();
 		final Member self = event.getGuild().getSelfMember();
 		final GuildVoiceState selfVS = self.getVoiceState();
+		final String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		if(!selfVS.inAudioChannel()) {
 			channel.sendMessage("i'm not in a voice channel").queue();
+			return;
 		}
 		
 		final Member member = event.getMember();
@@ -49,6 +51,11 @@ public class Remove implements CommandInterface {
 		
 		if(manager.scheduler.queue.isEmpty()) {
 			channel.sendMessage("there is nothing in the queue to remove").queue();
+			return;
+		}
+		
+		if(args.isEmpty()) {
+			channel.sendMessage("you need to provide the track number to remove\nsee `" + prefix + "help remove`").queue();
 			return;
 		}
 		
@@ -95,12 +102,13 @@ public class Remove implements CommandInterface {
 		return "remove";
 	}
 	
-	//If the prefix is used 
-	
-	
 	@Override
 	public String getHelp(String prefix) {
 		return "removes the *nth* track in the queue\n" + prefix + "remove `<n>`\nyou can also use " + prefix + "remove `all` to clear the queue";
+	}
+	
+	public List<String> getAliases() {
+		return List.of("rm");
 	}
 
 }

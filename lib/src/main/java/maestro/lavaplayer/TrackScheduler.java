@@ -1,5 +1,7 @@
 package maestro.lavaplayer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
@@ -85,6 +87,31 @@ public class TrackScheduler extends AudioEventAdapter {
 		this.channel = channel;
 	}
 	
+	/**
+	 * Puts all the tracks in the List to the front of the queue, and skips the currently playing song.
+	 * @param tracks the tracks to be placed at the front of the queue
+	 */
+	public void playSkip(List<AudioTrack> tracks) {
+		BlockingQueue<AudioTrack> nq = new LinkedBlockingQueue<>();
+		nq.addAll(tracks);
+		
+		for(AudioTrack track : queue) {
+			nq.offer(track);
+		}
+		
+		this.queue.clear();
+		this.queue.addAll(nq);
+		
+		nextTrack();
+	}
+
+	/**
+	 * Adds a single track to the front of the queue, and skips the currently playing song. 
+	 * @param track the track to be played immediately
+	 */
+	public void playSkip(AudioTrack track) {
+		playSkip(List.of(track));
+	}
 	
 	private class Inactivity implements Runnable {
 

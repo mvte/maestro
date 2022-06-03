@@ -29,8 +29,8 @@ public class Help implements CommandInterface{
 			embed
 				.setTitle("| maestro help |")
 				.setDescription("use `" + prefix + "help [command]` for more information about a command")
-				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `setprefix`, `bugs`", false)
-				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`", false)
+				.addField("basic commands", "`help`, `ping`, `hello`, `blackjack`, `setprefix`, `bugs`, `support`, `purge`", false)
+				.addField("music commands", "`join`, `leave`, `play`, `pause`, `skip`, `stop`, `np`, `queue`, `remove`, `repeat`, `playskip`", false)
 				//.addField("math commands", "`approxpi`, `countprimes`", false) 	these commands can break the bot D:
 				.addField("blackjack", "21", false)
 				//.addField("sniping", "you first", false)
@@ -56,8 +56,17 @@ public class Help implements CommandInterface{
 			.setDescription(cmd.getHelp(prefix))
 			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 		
-		channel.sendMessageEmbeds(embed.build()).queue();
+		if(!cmd.getAliases().isEmpty()) {
+			String aliases = "`";
+			for(String alias : cmd.getAliases()) {
+				aliases += alias + "`, `";
+			}
+			
+			aliases = aliases.substring(0, aliases.length()-3);
+			embed.addField("aliases", aliases, false);
+		}
 		
+		channel.sendMessageEmbeds(embed.build()).queue();
 	}
 
 	public String getName() {
@@ -65,7 +74,12 @@ public class Help implements CommandInterface{
 	}
 
 	public String getHelp(String prefix) {
-		return "bro";
+		return "displays the list of commands this bot has";
+	}
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("commands");
 	}
 
 }

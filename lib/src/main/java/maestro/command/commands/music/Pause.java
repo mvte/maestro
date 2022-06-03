@@ -59,5 +59,8 @@ public class Pause implements CommandInterface {
 		return "pauses the current track, or resumes it if already paused";
 	}
 	
-	
+	@Override
+	public List<String> getAliases() {
+		return List.of("resume", "unpause");
+	}
 }

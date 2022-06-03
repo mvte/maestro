@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import maestro.command.CommandInterface;
+import maestro.command.admin.Purge;
 import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
 import maestro.command.commands.Bugs;
@@ -15,11 +16,13 @@ import maestro.command.commands.Hello;
 import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
 import maestro.command.commands.Ping;
+import maestro.command.commands.Support;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
 import maestro.command.commands.music.Pause;
 import maestro.command.commands.music.Play;
+import maestro.command.commands.music.Playskip;
 import maestro.command.commands.music.Queue;
 import maestro.command.commands.music.Remove;
 import maestro.command.commands.music.Repeat;
@@ -57,11 +60,13 @@ public class CommandManager {
 		//addCommand(new ApproximatePi());
 		addCommand(new Bugs());
 		//addCommand(new CountPrimes());
+		addCommand(new Playskip());
+		addCommand(new Support());
+		addCommand(new Purge());
 	}
 
 	private void addCommand(CommandInterface cmd) {
-		// If the command already exists, then we don't want to add it to the command
-		// list.
+		// If the command already exists, then we don't want to add it to the command list.
 		boolean exists = this.commands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
 
 		if (exists)
@@ -79,7 +84,7 @@ public class CommandManager {
 		search = search.toLowerCase();
 
 		for (CommandInterface cmd : this.commands) {
-			if (cmd.getName().equals(search))
+			if (cmd.getName().equals(search) || cmd.getAliases().contains(search))
 				return cmd;
 		}
 
@@ -97,7 +102,6 @@ public class CommandManager {
 		CommandInterface cmd = this.getCommand(invoke);
 
 		if (cmd != null) {
-			event.getChannel().sendTyping().queue();
 			List<String> args = Arrays.asList(split).subList(1, split.length);
 
 			cmd.handle(event, args);

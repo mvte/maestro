@@ -24,6 +24,11 @@ public class Blackjack implements CommandInterface {
 					"usage: " + prefix + "blackjack `[command]`\n" +
 					"`start` begins a game of blackjack";
 	}
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("bj");
+	}
 
 }
 

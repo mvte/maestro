@@ -55,5 +55,10 @@ public class Leave implements CommandInterface {
 	public String getHelp(String prefix) {
 		return "have maestro leave your voice channel";
 	}
-
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("l");
+	}
+	
 }

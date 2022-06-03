@@ -1,22 +1,28 @@
 package maestro.command.commands.music;
 
-import java.net.URL;
 import java.util.List;
 
 import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Play implements CommandInterface {
-	
+public class Playskip implements CommandInterface {
+
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		final TextChannel channel = event.getTextChannel();
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		
+		// this command can be abused 
+		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+			channel.sendMessage("you must be a moderator to be able to use this command").queue();
+			return;
+		}
 		
 		// Check for search arguments
 		if(args.isEmpty()) {
@@ -40,42 +46,30 @@ public class Play implements CommandInterface {
 		
 		String link = String.join(" ", args);
 		
-		if(!isURL(link)) {
+		if(!Play.isURL(link)) {
 			link = "ytsearch:" + link + " ";	
 		}
 		
-		// Create PlayerManager and use it to load the song. 
-		PlayerManager.getInstance()
-			.loadAndPlay(channel, link);
+		PlayerManager.getInstance().loadAndPlaySkip(channel, link);
+		
 	}
 
 	@Override
 	public String getName() {
-		return "play";
+		return "playskip";
 	}
 
 	@Override
 	public String getHelp(String prefix) {
-		return "plays a song given a youtube link or search query\nusage: " + prefix + "play `[link/query]`\n";
+		return "skips the current song and plays the given song\n"+ prefix + "playskip `<link/query>`"
+				+ "\nif you provide a playlist, it will add the entire playlist to the front of the queue";
 	}
 	
 	@Override
 	public List<String> getAliases() {
-		return List.of("p");
+		return List.of("ps");
 	}
 	
-	/**
-	 * Checks if a string is a URL by attempting to create a URI object with it
-	 * @param url
-	 * @return true if URI object is created (therefore the string is a URL)
-	 */
-	static boolean isURL(String url) {
-		try {
-			new URL(url).toURI();
-			return true;	
-		} catch (Exception e) {
-			return false;
-		}
-	}
+	
 
 }

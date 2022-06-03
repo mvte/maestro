@@ -67,7 +67,12 @@ public class Join implements CommandInterface {
 	@Override
 	public String getHelp(String prefix) {
 		return "have maestro join your voice channel\n_you must be in a voice channel, and maestro must not be in another voice channel_";
-	} 
+	}
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("j");
+	}
 	
 	
 

@@ -21,12 +21,20 @@ public interface CommandInterface {
 	String getName();
 	
 	/**
-	 * Returns the help message when b.[command] help is called
+	 * Returns the help message when m.help [command] is called
 	 * @param prefix the server's prefix
 	 * @return help message
 	 */
 	String getHelp(String prefix);
 	
+	/**
+	 * Returns the list of aliases a certain command has. Allows the same command to be invoked with other arguments.
+	 * Please ensure that no two commands have duplicate aliases.
+	 * @return the list of aliases for a command
+	 */
+	default List<String> getAliases() {
+		return List.of();
+	}
 	
 
 }

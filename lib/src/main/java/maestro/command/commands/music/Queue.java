@@ -74,7 +74,7 @@ public class Queue implements CommandInterface {
 	 * @param time in milliseconds
 	 * @return String of format mm:ss
 	 */
-	private String formatTime(long ms) {
+	public static String formatTime(long ms) {
 		final long min = ms / TimeUnit.MINUTES.toMillis(1);
 		final long sec = ms % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
 		
@@ -89,6 +89,11 @@ public class Queue implements CommandInterface {
 	@Override
 	public String getHelp(String prefix) {
 		return "displays all the songs in the queue";
+	}
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("q");
 	}
 
 }

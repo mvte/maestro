@@ -3,6 +3,7 @@ package maestro.command.commands.music;
 import java.util.List;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
@@ -42,15 +43,19 @@ public class NowPlaying implements CommandInterface {
 		final GuildMusicManager manager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 		final AudioPlayer player = manager.audioPlayer;
 		
-		if(player.getPlayingTrack() != null) {
-			channel.sendMessage(":notes: now playing :notes:\n`" + player.getPlayingTrack().getInfo().title + "` by `" + player.getPlayingTrack().getInfo().author + "`").queue();
-			return;
-		} else {
+		if(player.getPlayingTrack() == null) {
 			channel.sendMessage("i'm not playing anything").queue();
+			return;
 		}
 		
+		AudioTrack track = player.getPlayingTrack();
 		
+		String curr = Queue.formatTime(track.getPosition());
+		String tot = Queue.formatTime(track.getDuration());
 		
+		String time = String.format("[`%s` / `%s`]", curr, tot);
+		
+		channel.sendMessage(":notes: now playing :notes:\n`" + track.getInfo().title + "` by `" + track.getInfo().author + "`\n" + time).queue();
 		
 	}
 
@@ -62,6 +67,11 @@ public class NowPlaying implements CommandInterface {
 	@Override
 	public String getHelp(String prefix) {
 		return "displays the song that is currently playing";
+	}
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("nowplaying");
 	}
 	
 }

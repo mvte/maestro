@@ -26,5 +26,9 @@ public class Micaela implements CommandInterface {
 		return "tells you about micaela :D";
 	}
 	
+	@Override
+	public List<String> getAliases() {
+		return List.of("micaelaconcepcion", "micaelaventuraconcepcion", "micaelamarzan", "prettiestgirlever", "mica", "micmic", "bbygirl");
+	}
 
 }

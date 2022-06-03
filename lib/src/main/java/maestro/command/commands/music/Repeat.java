@@ -69,6 +69,10 @@ public class Repeat implements CommandInterface {
 		// TODO Auto-generated method stub
 		return "repeats the currently playing song. if a song is already repeating, stops repeating";
 	}
-
+	
+	@Override
+	public List<String> getAliases() {
+		return List.of("rp");
+	}
 	
 }

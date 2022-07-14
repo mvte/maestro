@@ -12,6 +12,7 @@ import maestro.command.admin.Purge;
 import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
 import maestro.command.commands.Bugs;
+import maestro.command.commands.Coinflip;
 import maestro.command.commands.Hello;
 import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
@@ -63,6 +64,7 @@ public class CommandManager {
 		addCommand(new Playskip());
 		addCommand(new Support());
 		addCommand(new Purge());
+		addCommand(new Coinflip());
 	}
 
 	private void addCommand(CommandInterface cmd) {

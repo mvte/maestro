@@ -38,6 +38,10 @@ public class Play implements CommandInterface {
 			return;
 		}
 		
+		//if the bot didn't join after attempting to join, then there is a reason for not joining: we must return
+		if(!selfVoiceState.inAudioChannel())
+			return;
+		
 		String link = String.join(" ", args);
 		
 		if(!isURL(link)) {

@@ -8,10 +8,15 @@ import javax.security.auth.login.LoginException;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
+import maestro.lavaplayer.GuildMusicManager;
+import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -41,6 +46,19 @@ public class Bot {
 	public static void main(String[] args) throws Exception {
 		new Bot();
 		
+	}
+	
+	/**
+	 * Cleans a guild's audio state (i.e. closes audio connection, destroys player, clears future)
+	 * @param guild The guild who's audio state is to be cleaned
+	 */
+	public static void clean(Guild guild) {
+		final AudioManager audioManager = guild.getAudioManager();
+		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+		
+		audioManager.closeAudioConnection();
+		musicManager.audioPlayer.destroy();
+		musicManager.scheduler.future.cancel(false);
 	}
 	
 	

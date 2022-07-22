@@ -4,11 +4,13 @@ import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Listener extends ListenerAdapter{
 	
@@ -46,19 +48,20 @@ public class Listener extends ListenerAdapter{
 	@Override
 	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
 		// We want to leave the voice channel if there's no one else in it
-		Member self = event.getGuild().getSelfMember();
+		Guild guild = event.getGuild();
+		Member self = guild.getSelfMember();
 		
+		// if the person that left was us (force disconnect)
 		if(!self.getVoiceState().inAudioChannel()) {
+			Bot.clean(guild);
 			return;
 		}
 		
+		// if we are the last person in the call
 		if(self.getVoiceState().getChannel().getMembers().size() == 1 && self.getVoiceState().getChannel().getMembers().get(0).equals(self)) {
-			final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-			PlayerManager.getInstance().getMusicManager(event.getGuild()).scheduler.future.cancel(false);
-			musicManager.audioPlayer.destroy();
-			event.getGuild().getAudioManager().closeAudioConnection();
+			Bot.clean(guild);
+			return;
 		}
 		
 	}
-	
 }

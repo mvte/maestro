@@ -2,6 +2,7 @@ package maestro.command.commands.music;
 
 import java.util.List;
 
+import maestro.Bot;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
@@ -34,13 +35,9 @@ public class Leave implements CommandInterface {
 			return;
 		}
 		
-		final AudioManager audioManager = guild.getAudioManager();
-		final AudioChannel selfChannel = selfVoiceState.getChannel();
-		final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+		Bot.clean(guild);
 		
-		audioManager.closeAudioConnection();
-		musicManager.audioPlayer.destroy();
-		PlayerManager.getInstance().getMusicManager(guild).scheduler.future.cancel(false);
+		final AudioChannel selfChannel = selfVoiceState.getChannel();
 		channel.sendMessage("leaving :loud_sound: **" + selfChannel.getName() + "**").queue();
 		
 		

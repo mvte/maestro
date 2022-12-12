@@ -50,7 +50,7 @@ public class Bot {
 	
 	/**
 	 * Cleans a guild's audio state (i.e. closes audio connection, destroys player, clears future)
-	 * @param guild The guild who's audio state is to be cleaned
+	 * @param guild The guild whose audio state is to be cleaned
 	 */
 	public static void clean(Guild guild) {
 		final AudioManager audioManager = guild.getAudioManager();

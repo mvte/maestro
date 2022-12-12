@@ -4,6 +4,8 @@ import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
+import maestro.model.UserModel;
+import maestro.model.UserModelDatabase;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -24,16 +26,19 @@ public class Listener extends ListenerAdapter{
 		
 		final long guildId = event.getGuild().getIdLong();
 		String prefix = PrefixManager.PREFIXES.computeIfAbsent(guildId, DatabaseManager.INSTANCE::getPrefix);
-		
+
 		if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown") && event.getAuthor().getId().equals(Config.get("owner_id"))) {
 			event.getChannel().sendMessage("shutting down... bye bye :pleading_face:").complete();
 			System.out.println("shutting down");
 			event.getJDA().shutdown();
 			System.exit(0);
 		}
-        
-		if(event.getMessage().getContentRaw().startsWith(prefix))
+
+		boolean bool = UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getAuthor().getIdLong()));
+
+		if(event.getMessage().getContentRaw().startsWith(prefix)) {
 			manager.handle(event, prefix);
+		}
     }
 	
 	@Override

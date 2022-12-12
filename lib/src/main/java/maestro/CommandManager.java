@@ -10,14 +10,7 @@ import javax.annotation.Nullable;
 import maestro.command.CommandInterface;
 import maestro.command.admin.Purge;
 import maestro.command.admin.SetPrefix;
-import maestro.command.commands.Blackjack;
-import maestro.command.commands.Bugs;
-import maestro.command.commands.Coinflip;
-import maestro.command.commands.Hello;
-import maestro.command.commands.Help;
-import maestro.command.commands.Micaela;
-import maestro.command.commands.Ping;
-import maestro.command.commands.Support;
+import maestro.command.commands.*;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
@@ -29,6 +22,7 @@ import maestro.command.commands.music.Remove;
 import maestro.command.commands.music.Repeat;
 import maestro.command.commands.music.Skip;
 import maestro.command.commands.music.Stop;
+import maestro.command.commands.sniping.Snipe;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -65,6 +59,7 @@ public class CommandManager {
 		addCommand(new Support());
 		addCommand(new Purge());
 		addCommand(new Coinflip());
+		addCommand(new Snipe());
 	}
 
 	private void addCommand(CommandInterface cmd) {

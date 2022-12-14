@@ -10,6 +10,7 @@ public abstract class Snipe implements Serializable {
     String url;
     String itemName;
     ArrayList<UserModel> users;
+    URLType urlType;
 
     public abstract boolean inStock();
 
@@ -30,6 +31,20 @@ public abstract class Snipe implements Serializable {
     }
 
     public abstract String parseItemName();
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Snipe)) {
+            return false;
+        }
+
+        return ((Snipe)obj).getUrl().equals(url);
+    }
+
+    @Override
+    public int hashCode() {
+        return url.hashCode();
+    }
 
 
 }

@@ -23,10 +23,10 @@ public class Game {
 	
 	private LinkedList players;
 	private Node firstPlayerNode;
-	private Deck deck;
-	private Player dealer;
-	private TextChannel channel;
-	private EventWaiter waiter = Bot.waiter;
+	private final Deck deck;
+	private final Player dealer;
+	private final TextChannel channel;
+	private final EventWaiter waiter = Bot.waiter;
 	public boolean started = false;
 	
 	
@@ -221,9 +221,7 @@ public class Game {
 			
 			channel.sendMessageEmbeds(ebSpl.build()).setActionRow(Button.success("blackjack:yes_split_button", "split"), Button.danger("blackjack:no_split_button", "no")).queue( m ->
 			waiter.waitForEvent(ButtonInteractionEvent.class, 
-				(e) -> {
-					return e.getUser().equals(player.getUser()) && m.getIdLong() == e.getMessageIdLong();
-				}, e -> {
+				(e) -> e.getUser().equals(player.getUser()) && m.getIdLong() == e.getMessageIdLong(), e -> {
 					e.editComponents().queue();
 					
 					if(e.getComponentId().equals("blackjack:yes_split_button")) {
@@ -328,9 +326,8 @@ public class Game {
 				
 				//if playerNode.next == null and dealer has no blackjack, begin turns, otherwise, insurance bet for next player
 				insuranceSituation(playerNode.next);
-				return;
 			}, 30, TimeUnit.SECONDS, () -> {
-				channel.sendMessage("you took too long betting, no side bet set");
+				channel.sendMessage("you took too long betting, no side bet set").queue();
 				
 				if(playerNode.next == null) {
 					channel.sendMessage("dealer is checking face down card...").queue();
@@ -395,12 +392,8 @@ public class Game {
 		channel.sendMessageEmbeds(eb.build()).setActionRows(ar)
 			.queue( m -> 
 				waiter.waitForEvent(ButtonInteractionEvent.class, 
-					(e) -> {
-						return e.getUser().equals(p.getUser()) && e.getMessageIdLong() == m.getIdLong();
-					},
-					(e) -> {
-						play(pNode, e);
-					}, 30, TimeUnit.SECONDS, () -> {
+					(e) -> e.getUser().equals(p.getUser()) && e.getMessageIdLong() == m.getIdLong(),
+					(e) -> play(pNode, e), 30, TimeUnit.SECONDS, () -> {
 						channel.sendMessage("due to inactivity, " + p.getUser().getAsMention() + " stands").queue();
 						
 						if(pNode.next == null) {
@@ -526,12 +519,8 @@ public class Game {
 			
 			//wait for another hit or stand (then call this method again)
 			waiter.waitForEvent(ButtonInteractionEvent.class, 
-				e -> {
-					return e.getUser().equals(player.getUser()) && e.getMessageIdLong() == event.getMessageIdLong();
-				}, 
-				e -> { 
-					play(playerNode, e);
-				}, 30, TimeUnit.SECONDS, () -> { 
+				e -> e.getUser().equals(player.getUser()) && e.getMessageIdLong() == event.getMessageIdLong(),
+				e -> play(playerNode, e), 30, TimeUnit.SECONDS, () -> {
 					channel.sendMessage("due to inactivity, " + player.getUser().getAsMention() + " stands").queue();
 					//send to next method
 					if(playerNode.next == null) {
@@ -539,15 +528,13 @@ public class Game {
 					} else {
 						turn(playerNode.next);
 					}
-					return;
 				});
-			
 		}
 	}
 	
 	/**
-	 * Initiates the turn for the dealer. Like a normal player, this method will display the dealer's hand and it's value. The dealer will hit when they're hand is below 17 or
-	 * if they're on a "soft" 17. A 17 is considered "soft" when they have an ace who's value is 11. 
+	 * Initiates the turn for the dealer. Like a normal player, this method will display the dealer's hand and its value. The dealer will hit when they're hand is below 17 or
+	 * if they're on a "soft" 17. A 17 is considered "soft" when they have an ace whose value is 11.
 	 */
 	private void dealerTurn() {
 		EmbedBuilder eb = new EmbedBuilder()
@@ -699,11 +686,9 @@ public class Game {
 			.setThumbnail(channel.getJDA().getSelfUser().getAvatarUrl());
 				
 		channel.sendMessageEmbeds(eb.build()).setActionRow(Button.success("blackjack:continuebutton", "continue"), Button.danger("blackjack:end_game_button", "end game"), Button.secondary("blackjack:leave_game_button", "leave game")).queue(msg ->
-		waiter.waitForEvent(ButtonInteractionEvent.class, e -> {
-			return  !e.getComponentId().equals("blackjack:leave_game_button") 
-						&& e.getMessageIdLong() == msg.getIdLong()
-						&& (e.getUser().equals(firstPlayerNode.getPlayer().getUser()) || channel.getGuild().getMember(e.getUser()).hasPermission(Permission.MANAGE_SERVER));
-		},
+		waiter.waitForEvent(ButtonInteractionEvent.class, e -> !e.getComponentId().equals("blackjack:leave_game_button")
+					&& e.getMessageIdLong() == msg.getIdLong()
+					&& (e.getUser().equals(firstPlayerNode.getPlayer().getUser()) || channel.getGuild().getMember(e.getUser()).hasPermission(Permission.MANAGE_SERVER)),
 		e -> {
 
 			if(e.getComponentId().equals("blackjack:continuebutton")) {
@@ -718,7 +703,6 @@ public class Game {
 				e.editComponents().queue();
 				channel.sendMessage("──────────────────────────────────────").queue();
 				stop();
-				return;
 			}
 
 		}, 90, TimeUnit.SECONDS, () -> {
@@ -728,7 +712,6 @@ public class Game {
 			channel.sendMessage("received no response, stopping game").queue();
 			channel.sendMessage("──────────────────────────────────────").queue();
 			stop();
-			return;
 		}));
 	}
 	

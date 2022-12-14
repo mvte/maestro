@@ -17,17 +17,24 @@ public class Check implements CommandInterface {
         User jdaUser = Bot.bot.getUserById(user.getId());
 
         EmbedBuilder eb = new EmbedBuilder()
-                .setTitle("your snipes")
-                .setThumbnail(jdaUser.getAvatarUrl())
-                .setFooter(jdaUser.getName());
+            .setTitle("your snipes")
+            .setThumbnail(jdaUser.getAvatarUrl())
+            .setFooter(jdaUser.getName())
+            .setTimestamp(java.time.Instant.now());
 
         for(maestro.sniper.Snipe s : user.getSnipes()) {
             eb.addField(s.getItemName(), "[link](" + s.getUrl() + ")", false);
         }
 
-        jdaUser.openPrivateChannel()
-                .flatMap(channel -> channel.sendMessageEmbeds(eb.build()))
-                .queue();
+        try {
+            jdaUser.openPrivateChannel()
+                    .flatMap(channel -> channel.sendMessageEmbeds(eb.build()))
+                    .queue();
+            if(event.isFromGuild())
+                event.getChannel().sendMessage("your snipe list has been sent to your dms").queue();
+        } catch(NullPointerException e) {
+            event.getChannel().sendMessage("your dms are closed. please open them to receive your snipe list and snipe notifications").queue();
+        }
 
     }
 

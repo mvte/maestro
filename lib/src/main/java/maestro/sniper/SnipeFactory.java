@@ -5,6 +5,8 @@ public class SnipeFactory {
     public Snipe createSnipe(String urlString) {
         Snipe snipe;
         URLType url = URLType.getURLType(urlString);
+        if(url == null)
+            return null;
 
         switch(url) {
             case AMAZON:

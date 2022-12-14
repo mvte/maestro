@@ -2,6 +2,7 @@ package maestro.command.commands.sniping;
 
 import java.util.List;
 
+import maestro.Bot;
 import maestro.command.CommandInterface;
 import maestro.model.UserModel;
 import maestro.model.UserModelDatabase;
@@ -25,14 +26,12 @@ public class Snipe implements CommandInterface {
 		}
 
 		maestro.sniper.Snipe snipe = snipeFactory.createSnipe(args.get(0));
-
 		if(snipe == null) {
 			channel.sendMessage("something went wrong creating your snipe! check your url?").queue();
 			return;
 		}
 
 		UserModel user = UserModelDatabase.getInstance().getUser(userId);
-
 		if(!user.addSnipe(snipe)) {
 			channel.sendMessage("you are already sniping this item!").queue();
 			return;
@@ -46,8 +45,10 @@ public class Snipe implements CommandInterface {
 
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("successfully added snipe request")
-				.addField(snipe.getItemName(), "this item was added to your requests", false);
-
+				.setThumbnail(Bot.bot.getSelfUser().getAvatarUrl())
+				.addField(snipe.getItemName(), "you will be notified when this item is available", false)
+				.setFooter(event.getAuthor().getName())
+				.setTimestamp(java.time.Instant.now());
 		channel.sendMessageEmbeds(eb.build()).queue();
 	}
 

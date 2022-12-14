@@ -32,10 +32,17 @@ public class Snipe implements CommandInterface {
 		}
 
 		UserModel user = UserModelDatabase.getInstance().getUser(userId);
-		user.addSnipe(snipe);
-		snipe.addUser(user);
 
-		SnipeChecker.getInstance().addSnipe(snipe);
+		if(!user.addSnipe(snipe)) {
+			channel.sendMessage("you are already sniping this item!").queue();
+			return;
+		}
+
+		if(SnipeChecker.getInstance().addSnipe(snipe)) {
+			snipe.addUser(user);
+		} else {
+			SnipeChecker.getInstance().getSnipe(snipe).addUser(user);
+		}
 
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("successfully added snipe request")
@@ -52,7 +59,7 @@ public class Snipe implements CommandInterface {
 	@Override
 	public String getHelp(String prefix) {
 		return "the bot will send you a message when an item you want is in stock. currently, this bot only supports " +
-				"sniping best buy, and gamestop links\nusage: `m.snipe <link>`";
+				"sniping best buy and gamestop links, and rutgers course codes \nusage: `m.snipe <link/code>`";
 	}
 	
 }

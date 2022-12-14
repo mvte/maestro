@@ -2,6 +2,8 @@ package maestro;
 
 import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
+import maestro.model.UserModel;
+import maestro.model.UserModelDatabase;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -31,6 +33,8 @@ public class Listener extends ListenerAdapter{
 			event.getJDA().shutdown();
 			System.exit(0);
 		}
+
+		UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getAuthor().getIdLong()));
 
 		if(event.getMessage().getContentRaw().startsWith(prefix)) {
 			manager.handle(event, prefix);

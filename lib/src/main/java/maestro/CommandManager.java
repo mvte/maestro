@@ -22,6 +22,8 @@ import maestro.command.commands.music.Remove;
 import maestro.command.commands.music.Repeat;
 import maestro.command.commands.music.Skip;
 import maestro.command.commands.music.Stop;
+import maestro.command.commands.sniping.Check;
+import maestro.command.commands.sniping.RemoveSnipe;
 import maestro.command.commands.sniping.Snipe;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -60,6 +62,8 @@ public class CommandManager {
 		addCommand(new Purge());
 		addCommand(new Coinflip());
 		addCommand(new Snipe());
+		addCommand(new Check());
+		addCommand(new RemoveSnipe());
 	}
 
 	private void addCommand(CommandInterface cmd) {

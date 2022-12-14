@@ -58,7 +58,8 @@ public class Bot {
 		
 		audioManager.closeAudioConnection();
 		musicManager.audioPlayer.destroy();
-		musicManager.scheduler.future.cancel(false);
+		if(musicManager.scheduler.future != null)
+			musicManager.scheduler.future.cancel(false);
 	}
 	
 	

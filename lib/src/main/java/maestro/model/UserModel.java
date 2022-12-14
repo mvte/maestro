@@ -1,7 +1,6 @@
 package maestro.model;
 
 import maestro.sniper.Snipe;
-import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -10,11 +9,11 @@ import java.util.ArrayList;
 public class UserModel implements Serializable {
 
     /** unique user id from discord */
-    private long id;
+    private final long id;
     /** blackjack cash*/
     private int cash;
     /** snipe list*/
-    private ArrayList<Snipe> snipes;
+    private final ArrayList<Snipe> snipes;
 
     public UserModel(long id) {
         this.id = id;
@@ -30,8 +29,11 @@ public class UserModel implements Serializable {
         return snipes;
     }
 
-    public void addSnipe(Snipe snipe) {
-        snipes.add(snipe);
+    public boolean addSnipe(Snipe snipe) {
+        if(snipes.contains(snipe)) {
+            return false;
+        }
+        return snipes.add(snipe);
     }
 
     @Override
@@ -40,5 +42,10 @@ public class UserModel implements Serializable {
             return false;
 
         return ((UserModel)o).getId() == id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)id;
     }
 }

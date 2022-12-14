@@ -4,8 +4,7 @@ import maestro.Bot;
 import maestro.model.UserModel;
 import net.dv8tion.jda.api.entities.User;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.concurrent.*;
 
 /**
@@ -14,10 +13,10 @@ import java.util.concurrent.*;
 public class SnipeChecker {
 
     private static SnipeChecker INSTANCE;
-    private ArrayList<Snipe> snipes;
+    private final HashSet<Snipe> snipes;
 
     private SnipeChecker() {
-        this.snipes = new ArrayList<>();
+        this.snipes = new HashSet<>();
         run();
     }
 
@@ -29,25 +28,30 @@ public class SnipeChecker {
     }
 
     private void run() {
-        Bot.service.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                checkSnipes();
-            }
-        }, 0, 7, TimeUnit.SECONDS);
+        Bot.service.scheduleAtFixedRate(this::checkSnipes, 0, 7, TimeUnit.SECONDS);
     }
 
-    public void addSnipe(Snipe snipe) {
-        snipes.add(snipe);
+    public Snipe getSnipe(Snipe snipe) {
+        for(Snipe s : snipes) {
+            if(s.equals(snipe))
+                return s;
+        }
+
+        return null;
+    }
+
+    public boolean addSnipe(Snipe snipe) {
+        return snipes.add(snipe);
+    }
+
+    public void clearEmptySnipes() {
+        snipes.removeIf(s -> s.getUsers().isEmpty());
     }
 
     private void checkSnipes() {
         for(Snipe s : snipes) {
-            Bot.service.submit(new Runnable() {
-                @Override
-                public void run() {
-                    if(s.inStock()) notifyAllUsers(s);
-                }
+            Bot.service.submit(() -> {
+                if(s.inStock()) notifyAllUsers(s);
             });
         }
 
@@ -58,8 +62,10 @@ public class SnipeChecker {
             user.getSnipes().remove(snipe);
             snipes.remove(snipe);
             User jdaUser = Bot.bot.getUserById(user.getId());
+
+            String stockMessage = snipe instanceof RutgersSnipe ? " **is open!**\n" : " **is in stock!**\n";
             jdaUser.openPrivateChannel()
-                    .flatMap(channel -> channel.sendMessage(snipe.getItemName() + " **is in stock!**\n" + snipe.getUrl()))
+                    .flatMap(channel -> channel.sendMessage(snipe.getItemName() + stockMessage + snipe.getUrl()))
                     .queue();
         }
     }

@@ -24,7 +24,7 @@ public class Snipe implements CommandInterface {
 			return;
 		}
 
-		maestro.sniper.Snipe snipe = snipeFactory.createSnipe(args.get(0), userId);
+		maestro.sniper.Snipe snipe = snipeFactory.createSnipe(args.get(0));
 
 		if(snipe == null) {
 			channel.sendMessage("something went wrong creating your snipe! check your url?").queue();

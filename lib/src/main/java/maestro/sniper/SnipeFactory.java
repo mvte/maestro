@@ -2,15 +2,9 @@ package maestro.sniper;
 
 public class SnipeFactory {
 
-    public Snipe createSnipe(String urlString, long userId) {
+    public Snipe createSnipe(String urlString) {
         Snipe snipe;
-        String urlType;
         URLType url = URLType.getURLType(urlString);
-
-        if(url != null)
-            urlType = url.name();
-        else
-            return null;
 
         switch(url) {
             case AMAZON:
@@ -21,6 +15,9 @@ public class SnipeFactory {
                 break;
             case GAMESTOP:
                 snipe = new GameStopSnipe(urlString);
+                break;
+            case RUTGERS:
+                snipe = new RutgersSnipe(urlString);
                 break;
             default:
                 return null;

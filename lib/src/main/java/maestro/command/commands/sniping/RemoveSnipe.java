@@ -25,7 +25,7 @@ public class RemoveSnipe implements CommandInterface {
 
         UserModel user = UserModelDatabase.getInstance().getUser(event.getAuthor().getIdLong());
         SnipeFactory sf = new SnipeFactory();
-        maestro.sniper.Snipe s = sf.createSnipe(args.get(0), user.getId());
+        maestro.sniper.Snipe s = sf.createSnipe(args.get(0));
 
         maestro.sniper.Snipe realSnipe;
         if((realSnipe = SnipeChecker.getInstance().getSnipe(s)) == null) {

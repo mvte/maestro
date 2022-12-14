@@ -2,17 +2,12 @@ package maestro;
 
 import maestro.blackjack.BlackjackManager;
 import maestro.database.DatabaseManager;
-import maestro.lavaplayer.GuildMusicManager;
-import maestro.lavaplayer.PlayerManager;
-import maestro.model.UserModel;
-import maestro.model.UserModelDatabase;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Listener extends ListenerAdapter{
 	
@@ -23,9 +18,12 @@ public class Listener extends ListenerAdapter{
     {
         // We don't want to respond to other bots or read it if it's a webhook message.
 		if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
-		
-		final long guildId = event.getGuild().getIdLong();
-		String prefix = PrefixManager.PREFIXES.computeIfAbsent(guildId, DatabaseManager.INSTANCE::getPrefix);
+
+		String prefix = Config.get("prefix");
+		if(event.isFromGuild()) {
+			final long guildId = event.getGuild().getIdLong();
+			prefix = PrefixManager.PREFIXES.computeIfAbsent(guildId, DatabaseManager.INSTANCE::getPrefix);
+		}
 
 		if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown") && event.getAuthor().getId().equals(Config.get("owner_id"))) {
 			event.getChannel().sendMessage("shutting down... bye bye :pleading_face:").complete();
@@ -33,8 +31,6 @@ public class Listener extends ListenerAdapter{
 			event.getJDA().shutdown();
 			System.exit(0);
 		}
-
-		boolean bool = UserModelDatabase.getInstance().addUserIfNotExist(new UserModel(event.getAuthor().getIdLong()));
 
 		if(event.getMessage().getContentRaw().startsWith(prefix)) {
 			manager.handle(event, prefix);
@@ -65,7 +61,6 @@ public class Listener extends ListenerAdapter{
 		// if we are the last person in the call
 		if(self.getVoiceState().getChannel().getMembers().size() == 1 && self.getVoiceState().getChannel().getMembers().get(0).equals(self)) {
 			Bot.clean(guild);
-			return;
 		}
 		
 	}

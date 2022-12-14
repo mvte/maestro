@@ -2,7 +2,10 @@ package maestro.sniper;
 
 import maestro.Bot;
 import maestro.model.UserModel;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.HashSet;
 import java.util.concurrent.*;
@@ -28,7 +31,7 @@ public class SnipeChecker {
     }
 
     private void run() {
-        Bot.service.scheduleAtFixedRate(this::checkSnipes, 0, 7, TimeUnit.SECONDS);
+        Bot.service.scheduleAtFixedRate(this::checkSnipes, 0, 800, TimeUnit.MILLISECONDS);
     }
 
     public Snipe getSnipe(Snipe snipe) {
@@ -58,17 +61,23 @@ public class SnipeChecker {
     }
 
     private void notifyAllUsers(Snipe snipe) {
+        snipes.remove(snipe);
+        String stockMessage = snipe instanceof RutgersSnipe ? " **is open!**\n" : " **is in stock!**\n";
+        EmbedBuilder eb = new EmbedBuilder()
+                .setTitle(snipe.getItemName() + stockMessage)
+                .setThumbnail(Bot.bot.getSelfUser().getAvatarUrl())
+                .addField("now's your chance.", "press the button below to go to the item's webpage", false)
+                .setTimestamp(java.time.Instant.now());
+        ActionRow ar = ActionRow.of(Button.link(snipe.getUrl(), "go to"));
+
         for(UserModel user : snipe.getUsers()) {
             user.getSnipes().remove(snipe);
-            snipes.remove(snipe);
             User jdaUser = Bot.bot.getUserById(user.getId());
 
-            String stockMessage = snipe instanceof RutgersSnipe ? " **is open!**\n" : " **is in stock!**\n";
             jdaUser.openPrivateChannel()
-                    .flatMap(channel -> channel.sendMessage(snipe.getItemName() + stockMessage + snipe.getUrl()))
+                    .flatMap(channel -> channel.sendMessageEmbeds(eb.setFooter(jdaUser.getName()).build())
+                            .setActionRows(ar))
                     .queue();
         }
     }
-
-
 }

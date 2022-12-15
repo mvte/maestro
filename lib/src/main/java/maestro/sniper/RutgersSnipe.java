@@ -1,5 +1,7 @@
 package maestro.sniper;
 
+import maestro.model.RutgersCourseDatabase;
+import maestro.model.RutgersSection;
 import org.json.simple.JSONArray;
 
 import org.json.simple.parser.JSONParser;
@@ -51,7 +53,12 @@ public class RutgersSnipe extends Snipe {
 
     @Override
     public String parseItemName() {
-        return index;
+        RutgersSection rs = RutgersCourseDatabase.getInstance().getSection(index);
+        if(rs == null) {
+            return "ITEM_NAME_NOT_FOUND";
+        }
+
+        return String.format("%s - Section %s | %s", rs.getIndex(), rs.getSection(), rs.getTitle());
     }
 
     @Override
@@ -69,7 +76,10 @@ public class RutgersSnipe extends Snipe {
     }
 
     public static void main(String[] args) {
-        RutgersSnipe rutgersSnipe = new RutgersSnipe("02962");
+        System.out.println(RutgersCourseDatabase.getInstance().loadFromEndpoint());
+        RutgersSnipe rutgersSnipe = new RutgersSnipe("15534");
 
+        System.out.println(rutgersSnipe.getItemName());
+        System.out.println(rutgersSnipe.inStock());
     }
 }

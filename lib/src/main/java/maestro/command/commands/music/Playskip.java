@@ -47,7 +47,7 @@ public class Playskip implements CommandInterface {
 		String link = String.join(" ", args);
 		
 		if(!Play.isURL(link)) {
-			link = "ytsearch:" + link + " ";	
+			link = "ytsearch:" + link + " audio ";
 		}
 		
 		PlayerManager.getInstance().loadAndPlaySkip(channel, link);

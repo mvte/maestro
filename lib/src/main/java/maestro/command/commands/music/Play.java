@@ -41,7 +41,7 @@ public class Play implements CommandInterface {
 		String link = String.join(" ", args);
 		
 		if(!isURL(link)) {
-			link = "ytsearch:" + link + " ";	
+			link = "ytsearch:" + link + " audio ";
 		}
 		
 		// Create PlayerManager and use it to load the song. 

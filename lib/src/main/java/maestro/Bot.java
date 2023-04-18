@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -31,7 +30,7 @@ public class Bot {
 	private Bot() throws LoginException, SQLException {
 		
 		bot = JDABuilder.createDefault(Config.get("token"))
-			.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES)
+			.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.setChunkingFilter(ChunkingFilter.ALL)
 			.enableCache(CacheFlag.VOICE_STATE)

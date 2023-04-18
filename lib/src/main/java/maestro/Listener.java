@@ -6,7 +6,7 @@ import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -46,7 +46,7 @@ public class Listener extends ListenerAdapter{
 	}
 	
 	@Override
-	public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
+	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
 		// We want to leave the voice channel if there's no one else in it
 		Guild guild = event.getGuild();
 		Member self = guild.getSelfMember();

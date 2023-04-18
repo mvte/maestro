@@ -7,14 +7,14 @@ import maestro.command.CommandInterface;
 import maestro.database.DatabaseManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SetPrefix implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		final TextChannel channel = event.getTextChannel();
+		final TextChannel channel = event.getChannel().asTextChannel();
 		final Member member = event.getMember();
 		
 		if(!member.hasPermission(Permission.MANAGE_SERVER)) {

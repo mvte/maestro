@@ -4,7 +4,7 @@ import java.util.List;
 
 import maestro.PrefixManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Display implements Interaction {
@@ -14,7 +14,7 @@ public class Display implements Interaction {
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		EmbedBuilder embed = new EmbedBuilder();
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		embed.setTitle("| blackjack |")

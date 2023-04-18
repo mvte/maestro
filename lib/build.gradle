@@ -1,41 +1,47 @@
 plugins {
   id("java")
   id("application")
-  id("com.github.johnrengelman.shadow") version "6.0.0"
+  id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-mainClassName = "maestro.Bot"
+application.mainClass = "maestro.Bot"
+version = '1.1.2'
 
-version '1.1.2'
-
-sourceCompatibility = 17
+shadowJar {
+    archiveFileName = 'maestro.jar'
+}
 
 repositories {
-  mavenCentral()
-  maven { // on kotlin dsl use `maven("https://m2.dv8tion.net/releases")` instead
-      url "https://m2.dv8tion.net/releases"
-  }
-  maven {
-  	url "https://jitpack.io"
-  }
-  maven { url "https://m2.chew.pro/releases" }
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://m2.dv8tion.net/releases"
+    }
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        url "https://m2.chew.pro/snapshots"
+    }
 }
 
 dependencies {
-  	implementation("net.dv8tion:JDA:5.0.0-alpha.11")
-  	implementation("com.github.sedmelluq:lavaplayer:PR650-SNAPSHOT")
+  	implementation("net.dv8tion:JDA:5.0.0-beta.8")
+  	implementation("com.github.sedmelluq:lavaplayer:1.3.77")
   	implementation("com.zaxxer:HikariCP:5.0.1")
   	implementation("org.xerial:sqlite-jdbc:3.36.0.3")
   	implementation("io.github.cdimascio:dotenv-java:2.2.3")
-  	implementation("pw.chew:jda-chewtils:1.24.1")
+  	implementation("pw.chew:jda-chewtils:2.0-SNAPSHOT")
 }
 
-compileJava.options.encoding = "UTF-8"
+compileJava {
+    options.encoding = "UTF-8"
+    options.incremental = true
+
+    sourceCompatibility = 17
+}
 
 task stage(dependsOn: ['build', 'shadowJar', 'clean'])
 build.mustRunAfter clean
-
-jar
-
 
 		

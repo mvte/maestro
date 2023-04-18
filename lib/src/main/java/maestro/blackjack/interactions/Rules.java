@@ -3,13 +3,13 @@ package maestro.blackjack.interactions;
 import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Rules implements Interaction {
 
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		EmbedBuilder eb = new EmbedBuilder();
 		
 		eb.setTitle("blackjack rules")

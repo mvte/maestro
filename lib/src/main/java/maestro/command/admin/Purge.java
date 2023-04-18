@@ -8,14 +8,14 @@ import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Purge implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {

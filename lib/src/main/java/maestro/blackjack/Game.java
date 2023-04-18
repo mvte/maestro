@@ -12,7 +12,7 @@ import maestro.blackjack.objects.Deck;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -80,7 +80,7 @@ public class Game {
 		channel.sendMessage(player.getUser().getAsMention() + ", please enter your bet").queue();
 		waiter.waitForEvent(MessageReceivedEvent.class, 
 			(e) -> {
-				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser()) || !e.getTextChannel().equals(channel)) {
+				if(e.getAuthor().isBot() || !e.getAuthor().equals(player.getUser()) || !e.getChannel().asTextChannel().equals(channel)) {
 					return false;
 				}
 				
@@ -392,7 +392,7 @@ public class Game {
 			ar = ActionRow.of(Button.primary("blackjack:hitbutton", "hit"), Button.secondary("blackjack:standbutton", "stand"));
 		}
 
-		channel.sendMessageEmbeds(eb.build()).setActionRows(ar)
+		channel.sendMessageEmbeds(eb.build()).setComponents(ar)
 			.queue( m -> 
 				waiter.waitForEvent(ButtonInteractionEvent.class, 
 					(e) -> {

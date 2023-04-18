@@ -3,14 +3,14 @@ package maestro.command.commands;
 import java.util.List;
 
 import maestro.command.CommandInterface;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Snipe implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		MessageChannel channel = event.getChannel();
+		PrivateChannel channel = event.getChannel().asPrivateChannel();
 		
 		channel.sendMessage("coming soon ;)").queue();
 	}

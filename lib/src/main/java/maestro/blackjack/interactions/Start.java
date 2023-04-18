@@ -6,7 +6,7 @@ import maestro.blackjack.BlackjackManager;
 import maestro.blackjack.GuildGameManager;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -16,7 +16,7 @@ public class Start implements Interaction {
 	
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		EmbedBuilder embed = new EmbedBuilder();
 		
 		embed.setTitle("| starting a game of blackjack |")

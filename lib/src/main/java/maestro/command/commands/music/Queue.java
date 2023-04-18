@@ -12,14 +12,14 @@ import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Queue implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		final TextChannel channel = event.getTextChannel();
+		final TextChannel channel = event.getChannel().asTextChannel();
 		final Member self = event.getGuild().getSelfMember();
 		final GuildVoiceState selfVS = self.getVoiceState();
 		
@@ -71,7 +71,7 @@ public class Queue implements CommandInterface {
 	
 	/**
 	 * Takes a duration of time in milliseconds and transforms it into a string of format minutes:seconds
-	 * @param time in milliseconds
+	 * @param ms time in milliseconds
 	 * @return String of format mm:ss
 	 */
 	public static String formatTime(long ms) {

@@ -2,9 +2,8 @@ package maestro.blackjack.interactions;
 
 import maestro.blackjack.BlackjackManager;
 import maestro.blackjack.GuildGameManager;
-import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class StartButton implements Interaction {
@@ -12,7 +11,7 @@ public class StartButton implements Interaction {
 	public void handle(ButtonInteractionEvent event) {
 		GuildGameManager gameManager = BlackjackManager.getInstance().getGameManager(event.getGuild());
 		boolean started = gameManager.started;
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		EmbedBuilder eb = new EmbedBuilder();
 		
 		if(started == true) {
@@ -34,7 +33,7 @@ public class StartButton implements Interaction {
 		event.editComponents().queue();
 		channel.sendMessageEmbeds(eb.build()).queue();
 		
-		gameManager.beginGame(event.getTextChannel());
+		gameManager.beginGame(event.getChannel().asTextChannel());
 	}
 	
 	@Override

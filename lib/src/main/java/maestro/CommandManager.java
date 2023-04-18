@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-
 import maestro.command.CommandInterface;
 import maestro.command.admin.Purge;
 import maestro.command.admin.SetPrefix;
@@ -30,6 +28,7 @@ import maestro.command.commands.music.Repeat;
 import maestro.command.commands.music.Skip;
 import maestro.command.commands.music.Stop;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * CommandManager

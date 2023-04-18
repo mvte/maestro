@@ -8,11 +8,11 @@ import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
 import maestro.lavaplayer.TrackScheduler;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -20,7 +20,7 @@ public class Join implements CommandInterface {
 	
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		final TextChannel channel = event.getTextChannel();
+		final TextChannel channel = event.getChannel().asTextChannel();
 		final Member member = event.getMember();
 		
 		if(member == null) {
@@ -48,7 +48,7 @@ public class Join implements CommandInterface {
 		}
 		
 		final AudioManager audioManager = guild.getAudioManager();
-		final AudioChannel memberChannel = member.getVoiceState().getChannel();
+		final VoiceChannel memberChannel = member.getVoiceState().getChannel().asVoiceChannel();
 		final TrackScheduler scheduler = PlayerManager.getInstance().getMusicManager(guild).scheduler;
 		
 		scheduler.setChannel(channel);

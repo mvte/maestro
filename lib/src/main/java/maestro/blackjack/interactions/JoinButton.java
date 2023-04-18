@@ -3,14 +3,14 @@ package maestro.blackjack.interactions;
 import maestro.blackjack.BlackjackManager;
 import maestro.blackjack.GuildGameManager;
 import maestro.blackjack.objects.Player;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class JoinButton implements Interaction {
 
 	public void handle(ButtonInteractionEvent event) {
 		GuildGameManager manager = BlackjackManager.getInstance().getGameManager(event.getGuild());
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		event.deferEdit().queue();
 		
 		if(manager.started) { 

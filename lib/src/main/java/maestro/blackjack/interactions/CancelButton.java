@@ -4,7 +4,7 @@ import maestro.PrefixManager;
 import maestro.blackjack.BlackjackManager;
 import maestro.blackjack.GuildGameManager;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class CancelButton implements Interaction {
@@ -12,7 +12,7 @@ public class CancelButton implements Interaction {
 	public void handle(ButtonInteractionEvent event) {
 		GuildGameManager gameManager = BlackjackManager.getInstance().getGameManager(event.getGuild());
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
-		TextChannel channel = event.getTextChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		boolean started = gameManager.started;
 		EmbedBuilder eb = new EmbedBuilder();
 		

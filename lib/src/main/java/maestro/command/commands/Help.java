@@ -3,12 +3,11 @@ package maestro.command.commands;
 import java.awt.Color;
 import java.util.List;
 
-import maestro.Bot;
 import maestro.CommandManager;
 import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Help implements CommandInterface{
@@ -20,7 +19,7 @@ public class Help implements CommandInterface{
 	}
 	
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		MessageChannel channel = event.getChannel();
+		PrivateChannel channel = event.getChannel().asPrivateChannel();
 		EmbedBuilder embed = new EmbedBuilder().setColor(new Color(0x000000));
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		

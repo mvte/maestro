@@ -4,21 +4,18 @@ import java.util.List;
 
 import maestro.Bot;
 import maestro.command.CommandInterface;
-import maestro.lavaplayer.GuildMusicManager;
-import maestro.lavaplayer.PlayerManager;
-import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 public class Leave implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		final MessageChannel channel = event.getChannel();
+		final PrivateChannel channel = event.getChannel().asPrivateChannel();
 		final Member member = event.getMember();
 		
 		if(member == null) {
@@ -37,7 +34,7 @@ public class Leave implements CommandInterface {
 		
 		Bot.clean(guild);
 		
-		final AudioChannel selfChannel = selfVoiceState.getChannel();
+		final VoiceChannel selfChannel = selfVoiceState.getChannel().asVoiceChannel();
 		channel.sendMessage("leaving :loud_sound: **" + selfChannel.getName() + "**").queue();
 		
 		

@@ -4,14 +4,14 @@ import java.util.List;
 
 import maestro.PrefixManager;
 import maestro.command.CommandInterface;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class ApproximatePi implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		MessageChannel channel = event.getChannel();
+		PrivateChannel channel = event.getChannel().asPrivateChannel();
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		
 		if(args.isEmpty()) {

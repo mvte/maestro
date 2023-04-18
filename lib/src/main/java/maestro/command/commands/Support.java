@@ -4,14 +4,14 @@ import java.util.List;
 
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Support implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		MessageChannel channel = event.getChannel();
+		PrivateChannel channel = event.getChannel().asPrivateChannel();
 		EmbedBuilder eb = new EmbedBuilder()
 				.setTitle("support")
 				.setThumbnail(event.getChannel().getJDA().getSelfUser().getAvatarUrl())

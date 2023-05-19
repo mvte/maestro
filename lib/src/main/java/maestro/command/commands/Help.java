@@ -8,6 +8,7 @@ import maestro.PrefixManager;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Help implements CommandInterface{
@@ -19,7 +20,7 @@ public class Help implements CommandInterface{
 	}
 	
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		PrivateChannel channel = event.getChannel().asPrivateChannel();
+		TextChannel channel = event.getChannel().asTextChannel();
 		EmbedBuilder embed = new EmbedBuilder().setColor(new Color(0x000000));
 		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
 		

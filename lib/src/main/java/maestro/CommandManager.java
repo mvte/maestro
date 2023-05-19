@@ -16,6 +16,7 @@ import maestro.command.commands.Help;
 import maestro.command.commands.Micaela;
 import maestro.command.commands.Ping;
 import maestro.command.commands.Support;
+import maestro.command.commands.math.CountPrimes;
 import maestro.command.commands.music.Join;
 import maestro.command.commands.music.Leave;
 import maestro.command.commands.music.NowPlaying;
@@ -59,7 +60,7 @@ public class CommandManager {
 		addCommand(new SetPrefix());
 		//addCommand(new ApproximatePi());
 		addCommand(new Bugs());
-		//addCommand(new CountPrimes());
+		addCommand(new CountPrimes());
 		addCommand(new Playskip());
 		addCommand(new Support());
 		addCommand(new Purge());

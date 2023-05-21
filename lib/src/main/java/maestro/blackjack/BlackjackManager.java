@@ -1,19 +1,25 @@
 package maestro.blackjack;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-import maestro.blackjack.interactions.CancelButton;
-import maestro.blackjack.interactions.Display;
-import maestro.blackjack.interactions.Interaction;
-import maestro.blackjack.interactions.JoinButton;
-import maestro.blackjack.interactions.Leave;
-import maestro.blackjack.interactions.Rules;
-import maestro.blackjack.interactions.Start;
-import maestro.blackjack.interactions.StartButton;
+import maestro.Bot;
+import maestro.Config;
+import maestro.blackjack.interactions.*;
+import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -23,9 +29,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class BlackjackManager {
 
 	private static BlackjackManager INSTANCE;
-	
 	private final Map<Long, GuildGameManager> gameManagers;
 	private final List<Interaction> interactions;
+	private final ScheduledExecutorService scheduler;
+
 
 	/**
 	 * Constructs the BlackjackManager instance (and registers all Interactions). There can only be one BlackjackManager Instance for every instance of the Bot.
@@ -33,7 +40,13 @@ public class BlackjackManager {
 	private BlackjackManager() {
 		this.gameManagers = new HashMap<>();
 		interactions = new ArrayList<>();
-		
+
+		/* Create the scheduler */
+		scheduler = Executors.newScheduledThreadPool(1);
+		LocalTime time = LocalTime.of(23,59,59);
+		long initialDelay = Duration.between(LocalTime.now(), time).toMillis();
+		scheduler.scheduleAtFixedRate(this::giveDailyCash, initialDelay, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS);
+
 		/* Register interactions here */
 		addInteraction(new StartButton());
 		addInteraction(new Display());
@@ -42,6 +55,23 @@ public class BlackjackManager {
 		addInteraction(new JoinButton());
 		addInteraction(new Rules());
 		addInteraction(new Leave());
+		addInteraction(new Leaderboard());
+		addInteraction(new Cash());
+	}
+
+	private void giveDailyCash() {
+		try {
+			Connection conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
+			conn.createStatement().executeUpdate("UPDATE amounts SET cash = cash + 100");
+			conn.close();
+		} catch(SQLException e) {
+			User user = Bot.bot.getUserById(Config.get("owner_id"));
+			user.openPrivateChannel()
+					.flatMap(channel ->
+							channel.sendMessage("something went wrong giving daily cash, please increment manually"))
+					.queue();
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -117,6 +147,25 @@ public class BlackjackManager {
 			intr.handle(event);
 		
 	}
+
+	public Player getPlayerFromDb(User user, Connection conn) {
+		String id = user.getId();
+		try {
+			Statement get = conn.createStatement();
+			get.execute("SELECT * FROM amounts WHERE id = " + id);
+			if(get.getResultSet().next()) {
+				return new Player(get.getResultSet().getInt("cash"), user);
+			}
+
+			Statement create = conn.createStatement();
+			create.execute("INSERT INTO amounts (id) VALUES (" + id + ")");
+			return new Player(1000, user);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
 	
 	/**
 	 * Gets the instance of the BlackjackManager, if the instance doesn't exist create it. There can only be one BlackjackManager instance
@@ -129,5 +178,6 @@ public class BlackjackManager {
 		
 		return INSTANCE;
 	}
-	
+
+
 }

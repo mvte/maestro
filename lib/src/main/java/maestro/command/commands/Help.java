@@ -4,10 +4,9 @@ import java.awt.Color;
 import java.util.List;
 
 import maestro.CommandManager;
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -22,7 +21,7 @@ public class Help implements CommandInterface{
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		TextChannel channel = event.getChannel().asTextChannel();
 		EmbedBuilder embed = new EmbedBuilder().setColor(new Color(0x000000));
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		
 		// Help command was invoked without any arguments, will display the default message
 		if(args.isEmpty()) {

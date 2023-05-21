@@ -2,7 +2,7 @@ package maestro.command.commands.math;
 
 import java.util.List;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -12,7 +12,7 @@ public class CountPrimes implements CommandInterface {
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		PrivateChannel channel = event.getChannel().asPrivateChannel();
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		
 		if(args.isEmpty()) {
 			channel.sendMessage("no argument provided\nsee `" + prefix + "help countprimes`").queue();

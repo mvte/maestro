@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import maestro.command.CommandInterface;
 import maestro.command.admin.Purge;
-import maestro.command.admin.SetPrefix;
 import maestro.command.commands.Blackjack;
 import maestro.command.commands.Bugs;
 import maestro.command.commands.Coinflip;
@@ -57,7 +56,6 @@ public class CommandManager {
 		addCommand(new Repeat());
 		addCommand(new Remove());
 		addCommand(new Pause());
-		addCommand(new SetPrefix());
 		//addCommand(new ApproximatePi());
 		addCommand(new Bugs());
 		addCommand(new CountPrimes());

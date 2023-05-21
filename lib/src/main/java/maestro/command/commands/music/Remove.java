@@ -5,7 +5,7 @@ import java.util.List;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
@@ -21,7 +21,7 @@ public class Remove implements CommandInterface {
 		final TextChannel channel = event.getChannel().asTextChannel();
 		final Member self = event.getGuild().getSelfMember();
 		final GuildVoiceState selfVS = self.getVoiceState();
-		final String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		final String prefix = Config.get("prefix");
 		
 		if(!selfVS.inAudioChannel()) {
 			channel.sendMessage("i'm not in a voice channel").queue();

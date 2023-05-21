@@ -3,7 +3,7 @@ package maestro.command.commands.music;
 import java.net.URL;
 import java.util.List;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -16,7 +16,7 @@ public class Play implements CommandInterface {
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		final TextChannel channel = event.getChannel().asTextChannel();
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		
 		// Check for search arguments
 		if(args.isEmpty()) {

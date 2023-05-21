@@ -2,7 +2,7 @@ package maestro.command.commands.music;
 
 import java.util.List;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.Permission;
@@ -16,7 +16,7 @@ public class Playskip implements CommandInterface {
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		final TextChannel channel = event.getChannel().asTextChannel();
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		
 		// this command can be abused 
 		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {

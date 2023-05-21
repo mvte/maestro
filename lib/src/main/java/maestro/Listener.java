@@ -1,7 +1,6 @@
 package maestro;
 
 import maestro.blackjack.BlackjackManager;
-import maestro.database.DatabaseManager;
 import maestro.lavaplayer.GuildMusicManager;
 import maestro.lavaplayer.PlayerManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,11 +19,11 @@ public class Listener extends ListenerAdapter{
     public void onMessageReceived(MessageReceivedEvent event)
     {
         // We don't want to respond to other bots or read it if it's a webhook message.
-		if (event.getAuthor().isBot() || event.isWebhookMessage()) return;
+		if (event.getAuthor().isBot() || event.isWebhookMessage());
+		String prefix = Config.get("prefix");
 		
 		final long guildId = event.getGuild().getIdLong();
-		String prefix = PrefixManager.PREFIXES.computeIfAbsent(guildId, DatabaseManager.INSTANCE::getPrefix);
-		
+
 		if(event.getMessage().getContentRaw().equalsIgnoreCase(prefix + "shutdown") && event.getAuthor().getId().equals(Config.get("owner_id"))) {
 			event.getChannel().sendMessage("shutting down... bye bye :pleading_face:").complete();
 			System.out.println("shutting down");

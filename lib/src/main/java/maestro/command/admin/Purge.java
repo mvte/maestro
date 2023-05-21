@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.command.CommandInterface;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,7 +16,7 @@ public class Purge implements CommandInterface {
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
 		TextChannel channel = event.getChannel().asTextChannel();
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		
 		if(!event.getMember().hasPermission(Permission.MANAGE_SERVER)) {
 			channel.sendMessage("you don't have the permission to do this").queue();

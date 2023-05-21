@@ -1,7 +1,12 @@
 package maestro.blackjack;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import maestro.Bot;
+import maestro.Config;
 import maestro.blackjack.objects.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -17,14 +22,37 @@ public class GuildGameManager {
 	private TextChannel channel;
 	public boolean started = false;
 	private ArrayList<Player> players;
+	private Connection conn;
 	
 	/**
 	 * Constructs an empty GuildGameManager
 	 */
 	public GuildGameManager() {
 		players = new ArrayList<>();
+		try {
+			conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
+			System.out.println("connected to db successfully");
+		} catch (SQLException e) {
+			conn = null;
+			System.out.println("something went wrong connecting to database");
+			e.printStackTrace();
+		}
 	}
-	
+
+	public Connection getConnection() {
+		return conn;
+	}
+
+	public void retryConnection() {
+		try {
+			conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
+			System.out.println("connected to db successfully after retrying");
+		} catch (SQLException e) {
+			conn = null;
+			System.out.println("something went wrong");
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Begins a game of blackjack.
@@ -33,10 +61,9 @@ public class GuildGameManager {
 	public void beginGame(TextChannel channel) {
 		
 		this.channel = channel;
-		game = new Game(6, channel, players);
+		game = new Game(6, channel, players, conn);
 		game.started = true;
 		this.started = game.started;
-		
 		
 		game.run();
 	}
@@ -85,7 +112,7 @@ public class GuildGameManager {
 	 * Nullifies the game instance to ensure a proper game end. But to achieve the behavior we want, we also have to remove all the Players in this manager's ArrayList of Players
 	 */
 	public void nullGame() {
-		players.removeAll(players);
+		players.clear();
 		game = null;
 	}
 	

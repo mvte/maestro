@@ -1,5 +1,7 @@
 package maestro;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,25 +28,27 @@ public class Bot {
 	public static String prefix = Config.get("PREFIX");
 	public static EventWaiter waiter = new EventWaiter();
 	public static ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+
+	public static final String db_url = "jdbc:mysql://db:3306/maestro";
+	public static final String db_user = "root";
+
 	
 	private Bot() throws LoginException, SQLException {
-		
 		bot = JDABuilder.createDefault(Config.get("token"))
 			.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT)
 			.setMemberCachePolicy(MemberCachePolicy.ALL)
 			.setChunkingFilter(ChunkingFilter.ALL)
 			.enableCache(CacheFlag.VOICE_STATE)
-			.setStatus(OnlineStatus.DO_NOT_DISTURB)
+			.setStatus(OnlineStatus.ONLINE)
 			.setActivity(Activity.playing("cards"))
 			.addEventListeners(new Listener(), waiter)
 			.build();
-		
+
 	}
 	
 	
 	public static void main(String[] args) throws Exception {
 		new Bot();
-		
 	}
 	
 	/**

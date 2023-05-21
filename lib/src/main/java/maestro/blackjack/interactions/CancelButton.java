@@ -1,6 +1,6 @@
 package maestro.blackjack.interactions;
 
-import maestro.PrefixManager;
+import maestro.Config;
 import maestro.blackjack.BlackjackManager;
 import maestro.blackjack.GuildGameManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -11,7 +11,7 @@ public class CancelButton implements Interaction {
 
 	public void handle(ButtonInteractionEvent event) {
 		GuildGameManager gameManager = BlackjackManager.getInstance().getGameManager(event.getGuild());
-		String prefix = PrefixManager.PREFIXES.get(event.getGuild().getIdLong());
+		String prefix = Config.get("prefix");
 		TextChannel channel = event.getChannel().asTextChannel();
 		boolean started = gameManager.started;
 		EmbedBuilder eb = new EmbedBuilder();

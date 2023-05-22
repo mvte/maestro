@@ -60,12 +60,16 @@ public class BlackjackManager {
 	}
 
 	private void giveDailyCash() {
+		User user = Bot.bot.getUserById(Config.get("owner_id"));
 		try {
 			Connection conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
 			conn.createStatement().executeUpdate("UPDATE amounts SET cash = cash + 100");
 			conn.close();
+			user.openPrivateChannel()
+					.flatMap(channel ->
+							channel.sendMessage("daily cash distributed successfully"))
+					.queue();
 		} catch(SQLException e) {
-			User user = Bot.bot.getUserById(Config.get("owner_id"));
 			user.openPrivateChannel()
 					.flatMap(channel ->
 							channel.sendMessage("something went wrong giving daily cash, please increment manually"))
@@ -80,10 +84,7 @@ public class BlackjackManager {
 	 * @return The GuildGameManager for the given guild
 	 */
 	public GuildGameManager getGameManager(Guild guild) {
-		return this.gameManagers.computeIfAbsent(guild.getIdLong(), (guildId) -> {
-			final GuildGameManager guildGameManager = new GuildGameManager();
-			return guildGameManager;
-		});
+		return this.gameManagers.computeIfAbsent(guild.getIdLong(), (guildId) -> new GuildGameManager());
 	}
 	
 	/**

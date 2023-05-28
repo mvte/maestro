@@ -40,6 +40,15 @@ public class GuildGameManager {
 	}
 
 	public Connection getConnection() {
+		try {
+			if(conn == null || conn.isClosed()) {
+				conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
+			}
+		} catch (SQLException e) {
+			conn = null;
+			System.out.println("something went wrong connecting to database");
+			e.printStackTrace();
+		}
 		return conn;
 	}
 

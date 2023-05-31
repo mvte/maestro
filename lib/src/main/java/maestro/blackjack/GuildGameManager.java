@@ -41,7 +41,7 @@ public class GuildGameManager {
 
 	public Connection getConnection() {
 		try {
-			if(conn == null || conn.isClosed()) {
+			if(conn == null || !conn.isValid(5) || conn.isClosed()) {
 				conn = DriverManager.getConnection(Bot.db_url, Bot.db_user, Config.get("db_pass"));
 			}
 		} catch (SQLException e) {
@@ -87,7 +87,7 @@ public class GuildGameManager {
 		
 		EmbedBuilder eb = new EmbedBuilder();
 		
-		if(game.started == false) {
+		if(!game.started) {
 			this.started = game.started; //redundant, but just in case
 			channel.sendMessage("there is no game currently running").queue();
 			return;

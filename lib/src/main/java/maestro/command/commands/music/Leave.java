@@ -4,18 +4,18 @@ import java.util.List;
 
 import maestro.Bot;
 import maestro.command.CommandInterface;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Leave implements CommandInterface {
 
 	@Override
 	public void handle(MessageReceivedEvent event, List<String> args) {
-		final PrivateChannel channel = event.getChannel().asPrivateChannel();
+		final TextChannel channel = event.getChannel().asTextChannel();
 		final Member member = event.getMember();
 		
 		if(member == null) {

@@ -23,11 +23,15 @@ repositories {
     maven {
         url "https://m2.chew.pro/snapshots"
     }
+    maven {
+        name = "arbjergDevSnapshots"
+        url = uri("https://maven.lavalink.dev/snapshots")
+    }
 }
 
 dependencies {
   	implementation("net.dv8tion:JDA:5.0.0-beta.8")
-  	implementation("com.github.sedmelluq:lavaplayer:1.3.77")
+    implementation("dev.arbjerg:lavaplayer:0eaeee195f0315b2617587aa3537fa202df07ddc-SNAPSHOT")
     implementation("mysql:mysql-connector-java:8.0.32")
   	implementation("pw.chew:jda-chewtils:2.0-SNAPSHOT")
 }
